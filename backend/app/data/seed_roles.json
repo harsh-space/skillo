@@ -1,0 +1,87 @@
+[
+  {
+    "role_id": "role_backend_developer",
+    "name": "Backend Developer",
+    "description": "Designs, builds, and maintains server-side architecture, REST/GraphQL APIs, databases, authentication, and cloud deployments.",
+    "required_skills": [
+      "skill_python_advanced",
+      "skill_sql",
+      "skill_rest_apis",
+      "skill_git",
+      "skill_auth",
+      "skill_docker",
+      "skill_orm",
+      "skill_fastapi",
+      "skill_redis",
+      "skill_unit_testing",
+      "skill_web_security",
+      "skill_system_design"
+    ]
+  },
+  {
+    "role_id": "role_frontend_developer",
+    "name": "Frontend Developer",
+    "description": "Creates responsive, accessible, high-performance web user interfaces using modern JavaScript/TypeScript, React, Next.js, and CSS architectures.",
+    "required_skills": [
+      "skill_html",
+      "skill_css",
+      "skill_javascript",
+      "skill_typescript",
+      "skill_react",
+      "skill_nextjs",
+      "skill_rest_apis",
+      "skill_git",
+      "skill_unit_testing",
+      "skill_web_security"
+    ]
+  },
+  {
+    "role_id": "role_fullstack_developer",
+    "name": "Full Stack Developer",
+    "description": "Builds end-to-end web applications combining robust backend services, scalable databases, and modern frontend user experiences.",
+    "required_skills": [
+      "skill_javascript",
+      "skill_typescript",
+      "skill_react",
+      "skill_nextjs",
+      "skill_nodejs",
+      "skill_sql",
+      "skill_rest_apis",
+      "skill_auth",
+      "skill_git",
+      "skill_docker",
+      "skill_cloud"
+    ]
+  },
+  {
+    "role_id": "role_devops_engineer",
+    "name": "DevOps Engineer",
+    "description": "Automates deployment pipelines, cloud infrastructure, container orchestration, monitoring, and ensures site reliability.",
+    "required_skills": [
+      "skill_linux",
+      "skill_git",
+      "skill_docker",
+      "skill_cicd",
+      "skill_cloud",
+      "skill_kubernetes",
+      "skill_monitoring",
+      "skill_web_security"
+    ]
+  },
+  {
+    "role_id": "role_ml_engineer",
+    "name": "Machine Learning Engineer",
+    "description": "Develops, trains, and deploys predictive machine learning models, deep learning architectures, and scalable data pipelines.",
+    "required_skills": [
+      "skill_python_basics",
+      "skill_python_advanced",
+      "skill_data_analysis",
+      "skill_ml_basics",
+      "skill_deep_learning",
+      "skill_sql",
+      "skill_git",
+      "skill_docker",
+      "skill_fastapi"
+    ]
+  }
+]
