@@ -1,0 +1,172 @@
+[
+  {
+    "skill_id": "skill_python_basics",
+    "name": "Python (basic)",
+    "description": "Fundamental programming syntax, variables, data structures (lists, dicts, sets), control flow, and functions in Python."
+  },
+  {
+    "skill_id": "skill_python_advanced",
+    "name": "Python (advanced)",
+    "description": "Object-oriented programming, decorators, generators, context managers, concurrency (asyncio, threading), and type hinting in Python."
+  },
+  {
+    "skill_id": "skill_html",
+    "name": "HTML",
+    "description": "Semantic HTML5 markup, web accessibility (a11y), DOM structure, and forms."
+  },
+  {
+    "skill_id": "skill_css",
+    "name": "CSS",
+    "description": "CSS3 styling, Flexbox, CSS Grid layouts, responsive design, animations, and CSS variables."
+  },
+  {
+    "skill_id": "skill_javascript",
+    "name": "JavaScript",
+    "description": "Modern ECMAScript (ES6+), closures, promises, async/await, DOM manipulation, and event-driven architecture."
+  },
+  {
+    "skill_id": "skill_typescript",
+    "name": "TypeScript",
+    "description": "Static typing for JavaScript, interfaces, generics, type guards, and modern TypeScript configuration."
+  },
+  {
+    "skill_id": "skill_react",
+    "name": "React",
+    "description": "Component-based UI development, hooks (useState, useEffect, useMemo), state management, and virtual DOM."
+  },
+  {
+    "skill_id": "skill_nextjs",
+    "name": "Next.js",
+    "description": "Server-side rendering (SSR), static site generation (SSG), React Server Components, App Router, and full-stack React framework."
+  },
+  {
+    "skill_id": "skill_nodejs",
+    "name": "Node.js",
+    "description": "Node.js event loop, runtime asynchronous I/O, file system operations, and npm package management."
+  },
+  {
+    "skill_id": "skill_fastapi",
+    "name": "FastAPI",
+    "description": "High-performance Python web framework, Pydantic data validation, OpenAPI autodocs, and asynchronous route handling."
+  },
+  {
+    "skill_id": "skill_rest_apis",
+    "name": "REST APIs",
+    "description": "RESTful API design principles, HTTP verbs, status codes, request/response headers, pagination, and JSON serialization."
+  },
+  {
+    "skill_id": "skill_graphql",
+    "name": "GraphQL",
+    "description": "GraphQL schema design, queries, mutations, resolvers, and Apollo/GraphQL clients."
+  },
+  {
+    "skill_id": "skill_sql",
+    "name": "SQL & Relational Databases",
+    "description": "Relational database modeling, complex SQL queries, JOINs, indexing, normalization, transactions, and ACID properties."
+  },
+  {
+    "skill_id": "skill_postgresql",
+    "name": "PostgreSQL",
+    "description": "Advanced PostgreSQL features, jsonb columns, full-text search, query optimization, EXPLAIN plans, and connection pooling."
+  },
+  {
+    "skill_id": "skill_mongodb",
+    "name": "MongoDB & NoSQL",
+    "description": "Document-oriented NoSQL database design, BSON format, aggregation pipelines, and indexing in MongoDB."
+  },
+  {
+    "skill_id": "skill_orm",
+    "name": "ORMs & Query Builders",
+    "description": "Object Relational Mapping with SQLAlchemy, Prisma, or TypeORM, migrations, entity relationships, and query performance."
+  },
+  {
+    "skill_id": "skill_auth",
+    "name": "Authentication & JWT",
+    "description": "User authentication, JWT token lifecycle, OAuth 2.0 / OpenID Connect, session management, password hashing (bcrypt), and RBAC authorization."
+  },
+  {
+    "skill_id": "skill_git",
+    "name": "Git & GitHub",
+    "description": "Version control workflows, branching strategies, merge conflicts, rebase, pull requests, and collaborative code reviews."
+  },
+  {
+    "skill_id": "skill_docker",
+    "name": "Docker & Containers",
+    "description": "Containerization fundamentals, writing Dockerfiles, multi-stage builds, Docker Compose for multi-container orchestration, and image optimization."
+  },
+  {
+    "skill_id": "skill_cicd",
+    "name": "CI/CD Pipelines",
+    "description": "Continuous Integration and Continuous Deployment with GitHub Actions, automated test pipelines, and automated artifact deployment."
+  },
+  {
+    "skill_id": "skill_linux",
+    "name": "Linux & Bash Scripting",
+    "description": "Linux shell navigation, command line tools, permission management, cron jobs, process management, and shell automation scripts."
+  },
+  {
+    "skill_id": "skill_redis",
+    "name": "Redis & Caching",
+    "description": "In-memory key-value data storage, caching strategies (cache-aside, write-through), rate limiting, pub/sub messaging, and TTL management."
+  },
+  {
+    "skill_id": "skill_message_queues",
+    "name": "Message Queues & Asynchronous Tasks",
+    "description": "Asynchronous task processing, message brokers with RabbitMQ or Celery, event-driven decoupling, and dead-letter queues."
+  },
+  {
+    "skill_id": "skill_unit_testing",
+    "name": "Unit & Integration Testing",
+    "description": "Automated test suites with pytest or Jest, test doubles/mocks, fixtures, integration testing, and test coverage metrics."
+  },
+  {
+    "skill_id": "skill_system_design",
+    "name": "System Design & Architecture",
+    "description": "Scalable web architecture, load balancing, horizontal scaling, database sharding/replication, CAP theorem, and microservices patterns."
+  },
+  {
+    "skill_id": "skill_cloud",
+    "name": "Cloud Basics (AWS / GCP)",
+    "description": "Core cloud infrastructure, compute instances (EC2/GCE), serverless functions, object storage (S3/GCS), and VPC networking."
+  },
+  {
+    "skill_id": "skill_web_security",
+    "name": "Web Security & OWASP",
+    "description": "Web vulnerability mitigation (OWASP Top 10), prevention of XSS, CSRF, SQL Injection, CORS configuration, and HTTPS/TLS encryption."
+  },
+  {
+    "skill_id": "skill_dsa",
+    "name": "Data Structures & Algorithms",
+    "description": "Time/space complexity (Big-O), arrays, hash maps, trees, graphs, dynamic programming, sorting, and algorithmic problem solving."
+  },
+  {
+    "skill_id": "skill_microservices",
+    "name": "Microservices & API Gateway",
+    "description": "Service decomposition, API gateway routing, service discovery, inter-service communication (gRPC, REST), and distributed tracing."
+  },
+  {
+    "skill_id": "skill_data_analysis",
+    "name": "Data Analysis & Pandas",
+    "description": "Data manipulation with Pandas, numerical computing with NumPy, data cleaning, exploratory data analysis, and tabular feature engineering."
+  },
+  {
+    "skill_id": "skill_ml_basics",
+    "name": "Machine Learning Fundamentals",
+    "description": "Supervised & unsupervised learning, regression, classification, scikit-learn, cross-validation, model evaluation metrics, and overfitting prevention."
+  },
+  {
+    "skill_id": "skill_deep_learning",
+    "name": "Deep Learning & PyTorch",
+    "description": "Neural networks, backpropagation, PyTorch/TensorFlow models, GPU acceleration, transformers, and model inference optimization."
+  },
+  {
+    "skill_id": "skill_kubernetes",
+    "name": "Kubernetes & Orchestration",
+    "description": "Container orchestration at scale, Pods, Deployments, Services, Ingress controllers, Helm charts, and cluster auto-scaling."
+  },
+  {
+    "skill_id": "skill_monitoring",
+    "name": "Monitoring & Observability",
+    "description": "Application logging, metrics collection (Prometheus, Grafana), health checks, alerting, and error tracking (Sentry)."
+  }
+]

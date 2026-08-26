@@ -1,0 +1,346 @@
+[
+  {
+    "resource_id": "res_py_basic_course",
+    "skill_id": "skill_python_basics",
+    "title": "Python for Everybody Specialization",
+    "url": "https://www.py4e.com/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_py_basic_remedial",
+    "skill_id": "skill_python_basics",
+    "title": "Python Fundamentals Refresher & Syntax Crash Course",
+    "url": "https://docs.python.org/3/tutorial/index.html",
+    "type": "course",
+    "is_remedial": true
+  },
+  {
+    "resource_id": "res_py_adv_course",
+    "skill_id": "skill_python_advanced",
+    "title": "Fluent Python: OOP, Decorators, & Asyncio Masterclass",
+    "url": "https://realpython.com/learning-paths/advanced-python-concepts/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_py_adv_remedial",
+    "skill_id": "skill_python_advanced",
+    "title": "Advanced Python Targeted Fundamentals Refresher",
+    "url": "https://docs.python.org/3/howto/functional.html",
+    "type": "course",
+    "is_remedial": true
+  },
+  {
+    "resource_id": "res_py_adv_proj",
+    "skill_id": "skill_python_advanced",
+    "title": "Project: Build a Concurrent Web Scraper & Task Engine",
+    "url": "https://realpython.com/async-io-python/",
+    "type": "project",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_html_course",
+    "skill_id": "skill_html",
+    "title": "MDN Web Docs: HTML5 Structuring the Web",
+    "url": "https://developer.mozilla.org/en-US/docs/Learn/HTML",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_css_course",
+    "skill_id": "skill_css",
+    "title": "CSS3 Flexbox and Grid Deep Dive",
+    "url": "https://developer.mozilla.org/en-US/docs/Learn/CSS",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_js_course",
+    "skill_id": "skill_javascript",
+    "title": "The Modern JavaScript Tutorial (javascript.info)",
+    "url": "https://javascript.info/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_ts_course",
+    "skill_id": "skill_typescript",
+    "title": "TypeScript Handbook & Practical Generics",
+    "url": "https://www.typescriptlang.org/docs/handbook/intro.html",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_react_course",
+    "skill_id": "skill_react",
+    "title": "React Official Documentation: Thinking in React",
+    "url": "https://react.dev/learn",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_nextjs_course",
+    "skill_id": "skill_nextjs",
+    "title": "Next.js App Router & Fullstack Architecture",
+    "url": "https://nextjs.org/learn",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_nodejs_course",
+    "skill_id": "skill_nodejs",
+    "title": "Node.js Asynchronous Runtime & Express Server Core",
+    "url": "https://nodejs.org/en/learn",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_fastapi_course",
+    "skill_id": "skill_fastapi",
+    "title": "FastAPI Web Framework: High-Performance APIs with Pydantic",
+    "url": "https://fastapi.tiangolo.com/tutorial/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_fastapi_remedial",
+    "skill_id": "skill_fastapi",
+    "title": "FastAPI Request Validation & Routing Refresher",
+    "url": "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "type": "course",
+    "is_remedial": true
+  },
+  {
+    "resource_id": "res_rest_apis_course",
+    "skill_id": "skill_rest_apis",
+    "title": "RESTful API Architectural Design & HTTP Standards",
+    "url": "https://restfulapi.net/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_rest_apis_remedial",
+    "skill_id": "skill_rest_apis",
+    "title": "HTTP Methods & Status Code Quick Primer",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview",
+    "type": "course",
+    "is_remedial": true
+  },
+  {
+    "resource_id": "res_rest_apis_proj",
+    "skill_id": "skill_rest_apis",
+    "title": "Project: Design and Build an E-Commerce REST API",
+    "url": "https://github.com/tastejs/realworld",
+    "type": "project",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_graphql_course",
+    "skill_id": "skill_graphql",
+    "title": "GraphQL Schema Design & Execution Engine",
+    "url": "https://graphql.org/learn/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_sql_course",
+    "skill_id": "skill_sql",
+    "title": "SQL & Relational Database Design: Indexing, Joins & ACID",
+    "url": "https://sqlbolt.com/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_sql_remedial",
+    "skill_id": "skill_sql",
+    "title": "Interactive SQL Queries & Joins Practice",
+    "url": "https://www.w3schools.com/sql/",
+    "type": "course",
+    "is_remedial": true
+  },
+  {
+    "resource_id": "res_postgres_course",
+    "skill_id": "skill_postgresql",
+    "title": "PostgreSQL Mastery: Performance Tuning & Advanced Queries",
+    "url": "https://www.postgresqltutorial.com/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_mongodb_course",
+    "skill_id": "skill_mongodb",
+    "title": "MongoDB University: Data Modeling & Aggregation Pipelines",
+    "url": "https://learn.mongodb.com/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_orm_course",
+    "skill_id": "skill_orm",
+    "title": "SQLAlchemy & Alembic: Database Migrations & Relationship Mapping",
+    "url": "https://docs.sqlalchemy.org/en/20/tutorial/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_auth_course",
+    "skill_id": "skill_auth",
+    "title": "Web Security: JWT, OAuth 2.0, Refresh Tokens & RBAC",
+    "url": "https://auth0.com/learn/json-web-tokens/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_auth_remedial",
+    "skill_id": "skill_auth",
+    "title": "Authentication & Password Hashing Fundamentals",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/Security",
+    "type": "course",
+    "is_remedial": true
+  },
+  {
+    "resource_id": "res_git_course",
+    "skill_id": "skill_git",
+    "title": "Pro Git: Branching, Rebasing, & Production Workflows",
+    "url": "https://git-scm.com/book/en/v2",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_docker_course",
+    "skill_id": "skill_docker",
+    "title": "Docker & Containerization for Backend Engineers",
+    "url": "https://docs.docker.com/get-started/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_docker_remedial",
+    "skill_id": "skill_docker",
+    "title": "Container Basics & Docker CLI Essentials",
+    "url": "https://docs.docker.com/get-started/02_our_app/",
+    "type": "course",
+    "is_remedial": true
+  },
+  {
+    "resource_id": "res_cicd_course",
+    "skill_id": "skill_cicd",
+    "title": "Automated CI/CD with GitHub Actions",
+    "url": "https://docs.github.com/en/actions/learn-github-actions",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_linux_course",
+    "skill_id": "skill_linux",
+    "title": "Linux Command Line & Bash Automation Primer",
+    "url": "https://linuxjourney.com/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_redis_course",
+    "skill_id": "skill_redis",
+    "title": "Redis University: In-Memory Caching & Rate Limiting",
+    "url": "https://university.redis.io/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_mq_course",
+    "skill_id": "skill_message_queues",
+    "title": "Asynchronous Task Queues with RabbitMQ & Celery",
+    "url": "https://docs.celeryq.dev/en/stable/getting-started/introduction.html",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_testing_course",
+    "skill_id": "skill_unit_testing",
+    "title": "Effective Python Testing with pytest & Mocks",
+    "url": "https://docs.pytest.org/en/latest/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_system_design_course",
+    "skill_id": "skill_system_design",
+    "title": "System Design Primer: Scalability, Caching, & Sharding",
+    "url": "https://github.com/donnemartin/system-design-primer",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_cloud_course",
+    "skill_id": "skill_cloud",
+    "title": "Cloud Computing Fundamentals (AWS/GCP)",
+    "url": "https://aws.amazon.com/training/digital/aws-cloud-practitioner-essentials/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_web_sec_course",
+    "skill_id": "skill_web_security",
+    "title": "OWASP Top 10 Web Vulnerability Defense",
+    "url": "https://owasp.org/www-project-top-ten/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_dsa_course",
+    "skill_id": "skill_dsa",
+    "title": "Data Structures and Algorithm Visualizations",
+    "url": "https://visualgo.net/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_microservices_course",
+    "skill_id": "skill_microservices",
+    "title": "Microservices Patterns and Distributed Architecture",
+    "url": "https://microservices.io/patterns/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_data_analysis_course",
+    "skill_id": "skill_data_analysis",
+    "title": "Python for Data Analysis with Pandas & NumPy",
+    "url": "https://pandas.pydata.org/docs/getting_started/index.html",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_ml_basics_course",
+    "skill_id": "skill_ml_basics",
+    "title": "Scikit-Learn Machine Learning in Python",
+    "url": "https://scikit-learn.org/stable/tutorial/index.html",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_deep_learning_course",
+    "skill_id": "skill_deep_learning",
+    "title": "Deep Learning with PyTorch: Zero to GANs",
+    "url": "https://pytorch.org/tutorials/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_k8s_course",
+    "skill_id": "skill_kubernetes",
+    "title": "Kubernetes Official Interactive Tutorials",
+    "url": "https://kubernetes.io/docs/tutorials/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_monitoring_course",
+    "skill_id": "skill_monitoring",
+    "title": "Prometheus & Grafana Observability Guide",
+    "url": "https://prometheus.io/docs/introduction/overview/",
+    "type": "course",
+    "is_remedial": false
+  }
+]
