@@ -126,13 +126,12 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
                 <span>Tell us about yourself</span>
               </div>
               <div className="pt-2">
-                <label className="block text-xs font-medium text-slate-300 mb-2">Your Name</label>
                 <input
                   type="text"
                   value={learnerName}
                   onChange={(e) => setLearnerName(e.target.value)}
                   className="w-full bg-slate-900/90 border border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none transition-colors"
-                  placeholder="e.g. Alex"
+                  placeholder="Your Name"
                   autoFocus
                 />
               </div>
@@ -149,18 +148,18 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
                 <span>Tell us about aspiration</span>
               </div>
               <div className="pt-2">
-                <label className="block text-xs font-medium text-slate-300 mb-2">Career Goal & Desired Focus</label>
                 <textarea
                   rows={4}
                   value={goalText}
                   onChange={(e) => setGoalText(e.target.value)}
                   className="w-full bg-slate-900/90 border border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none transition-colors resize-none"
-                  placeholder="e.g. I know basic Python and HTML, and I want to become a Backend Developer building scalable APIs."
+                  placeholder="Career Goal & Desired Focus"
                   autoFocus
                 />
               </div>
             </div>
           )}
+
 
           {/* Section 3: Tell us about your current skillset */}
           {activeStep === 2 && (
