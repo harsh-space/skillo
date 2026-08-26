@@ -94,12 +94,6 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
     (s) => s.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const stepsMeta = [
-    { title: 'Tell us about yourself', desc: 'Personalize your profile identity' },
-    { title: 'Tell us about aspiration', desc: 'Describe your target career outcome' },
-    { title: 'Tell us about your current skillset', desc: 'Select competencies you already understand' },
-  ];
-
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
       {/* Header */}
@@ -117,32 +111,8 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
         </div>
       </div>
 
-      {/* Wizard Progress Pills */}
-      <div className="flex items-center justify-center gap-2 mb-6">
-        {stepsMeta.map((step, idx) => (
-          <button
-            key={idx}
-            type="button"
-            onClick={() => setActiveStep(idx)}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-              activeStep === idx
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : idx < activeStep
-                ? 'bg-indigo-950/60 text-indigo-300 border border-indigo-800/60 hover:bg-indigo-900/60'
-                : 'bg-slate-900/80 text-slate-400 border border-slate-800 hover:bg-slate-800'
-            }`}
-          >
-            <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
-              activeStep === idx ? 'bg-white text-indigo-600 font-bold' : 'bg-slate-800 text-slate-300'
-            }`}>
-              {idx + 1}
-            </span>
-            <span className="hidden sm:inline">{idx === 0 ? 'Identity' : idx === 1 ? 'Aspiration' : 'Skillset'}</span>
-          </button>
-        ))}
-      </div>
-
       <form onSubmit={handleSubmit}>
+
         {/* Single Dynamic Block Space */}
         <div className="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800/80 min-h-[320px] flex flex-col justify-between shadow-2xl relative">
           
