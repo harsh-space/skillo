@@ -34,9 +34,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="AI-Powered Personalized Learning Path Recommender API",
-    description="Backend service for HCLTech AMPlified Hackathon Pathfinder Prototype",
-    version="1.0.0",
+    title="Skillo AI — Intelligent Learning Path Recommender API",
+    description="Backend AI and graph intelligence engine for Skillo AI",
+    version="1.1.0",
     lifespan=lifespan
 )
 

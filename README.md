@@ -1,5 +1,4 @@
-# Pathfinder AI — AI-Powered Personalized Learning Path Recommender
-### HCLTech AMPlified · Season 1 · 2026 — Round 2 (Pathfinder Prototype)
+# Skillo AI — AI-Powered Personalized Learning Path Recommender
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg)](https://fastapi.tiangolo.com)
@@ -11,9 +10,9 @@
 
 ## 📌 Executive Summary
 
-**Pathfinder AI** is an intelligent career learning assistant designed for the **HCLTech AMPlified Round 2 (Pathfinder Prototype)** challenge. It bridges the gap between high-level career aspirations and actionable, prerequisite-respecting study plans. 
+**Skillo AI** is an intelligent career learning assistant that bridges the gap between high-level career aspirations and actionable, prerequisite-respecting study plans. 
 
-Given a learner's current competencies and a natural-language goal (e.g., *"I know HTML, CSS, and basic Python and want to become a backend developer"*), Pathfinder AI:
+Given a learner's current competencies and a natural-language goal (e.g., *"I know HTML, CSS, and basic Python and want to become a backend developer"*), Skillo AI:
 1. **Parses the goal** into structured target roles and competencies via taxonomy-constrained intent extraction.
 2. **Computes skill gaps** using cosine similarity over `sentence-transformers` (`all-MiniLM-L6-v2`) embeddings.
 3. **Constructs a Directed Acyclic Graph (DAG)** and computes a prerequisite closure, outputting a strictly valid topological sequence of courses and projects.
@@ -77,7 +76,7 @@ Given a learner's current competencies and a natural-language goal (e.g., *"I kn
 
 ## 🎯 Alignment with HCLTech Evaluation Criteria
 
-| Criterion | Weight | How Pathfinder AI Fulfills It |
+| Criterion | Weight | How Skillo AI Fulfills It |
 |---|---|---|
 | **Functionality & Feature Completeness** | **25%** | Complete end-to-end flow from natural-language goal entry, embedding gap analysis, topological DAG roadmap generation, interactive "Why this?" XAI, and quiz score adaptive re-ranking. |
 | **Problem Understanding & Solution Design** | **20%** | Faithful implementation of HCL's required system modules; strict adherence to single-domain scoping with realistic, curated industry skills and prerequisite chains. |
@@ -187,5 +186,5 @@ The application includes built-in one-click presets to reproduce the benchmark s
 
 ---
 
-## 📄 License & Team
-Built for **HCLTech AMPlified 2026 Hackathon (Round 2 Pathfinder Prototype)**.
+## 📄 Project Info
+Developed by the **Skillo AI Team**.

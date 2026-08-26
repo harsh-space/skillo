@@ -1,4 +1,4 @@
-# Pathfinder AI — Frontend Web Application
+# Skillo AI — Frontend Web Application
 
 Modern Next.js 14 web application featuring dark-mode glassmorphic aesthetics, interactive roadmap timelines, grounded Explainable AI (XAI) drawers, real-time DAG competency visualization, and adaptive assessment simulation.
 

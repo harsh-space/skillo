@@ -1,4 +1,4 @@
-# Pathfinder AI — Backend Service
+# Skillo AI — Backend Service
 
 FastAPI-powered intelligent learning path recommender engine integrating sentence-transformer embedding gap analysis, NetworkX DAG topological sorting, grounded Explainable AI (XAI), and rule-based adaptive feedback loops.
 
