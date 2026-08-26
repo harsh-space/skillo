@@ -168,5 +168,15 @@
     "skill_id": "skill_monitoring",
     "name": "Monitoring & Observability",
     "description": "Application logging, metrics collection (Prometheus, Grafana), health checks, alerting, and error tracking (Sentry)."
+  },
+  {
+    "skill_id": "skill_llm_rag",
+    "name": "LLM Applications & RAG Systems",
+    "description": "Building AI applications with Large Language Models, prompt engineering, Retrieval-Augmented Generation (RAG), LangChain/LlamaIndex, and AI agents."
+  },
+  {
+    "skill_id": "skill_vector_dbs",
+    "name": "Vector Databases & Embeddings",
+    "description": "Dense vector representations, similarity search algorithms, vector store databases (Chroma, Pinecone, FAISS), and hybrid search retrieval."
   }
 ]

@@ -33,5 +33,8 @@
   { "from_skill_id": "skill_cloud", "to_skill_id": "skill_monitoring" },
   { "from_skill_id": "skill_microservices", "to_skill_id": "skill_system_design" },
   { "from_skill_id": "skill_data_analysis", "to_skill_id": "skill_ml_basics" },
-  { "from_skill_id": "skill_ml_basics", "to_skill_id": "skill_deep_learning" }
+  { "from_skill_id": "skill_ml_basics", "to_skill_id": "skill_deep_learning" },
+  { "from_skill_id": "skill_deep_learning", "to_skill_id": "skill_llm_rag" },
+  { "from_skill_id": "skill_llm_rag", "to_skill_id": "skill_vector_dbs" },
+  { "from_skill_id": "skill_vector_dbs", "to_skill_id": "skill_fastapi" }
 ]
