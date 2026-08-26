@@ -4,7 +4,7 @@ from app.models.schemas import RecommendRequest, RoadmapResponse
 from app.services.db import db
 from app.services.gap_analysis import run_gap_analysis
 from app.services.path_generator import generate_learning_path
-from app.services.xai import generate_grounded_explanation
+from app.services.xai import _template_grounded_explanation
 
 router = APIRouter(tags=["Recommendation"])
 
@@ -49,9 +49,9 @@ def generate_recommendation(req: RecommendRequest):
         gap_scores=gap_scores
     )
 
-    # 5. Attach grounded explanations
+    # 5. Attach grounded explanations (instant graph-grounded template for roadmap display)
     for step in raw_steps:
-        step.explanation = generate_grounded_explanation(step, role_name, raw_steps)
+        step.explanation = _template_grounded_explanation(step, role_name, raw_steps)
 
     now_iso = datetime.now(timezone.utc).isoformat()
 

@@ -49,9 +49,13 @@ def _fallback_similarity(text_a: str, text_b: str) -> float:
 
 def get_skill_embedding(skill_name: str, skill_desc: str = "") -> Any:
     text = f"{skill_name}: {skill_desc}" if skill_desc else skill_name
+    if text in _skill_embeddings_cache:
+        return _skill_embeddings_cache[text]
     model = get_embedding_model()
     if model != "fallback":
-        return model.encode(text)
+        vec = model.encode(text)
+        _skill_embeddings_cache[text] = vec
+        return vec
     return None
 
 

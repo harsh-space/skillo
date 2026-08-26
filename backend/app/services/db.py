@@ -28,20 +28,22 @@ class DatabaseClient:
         self._load_local_db()
 
     def _init_firestore(self):
+        cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+        if not cred_path or not os.path.exists(cred_path):
+            self.firestore_db = None
+            return
+
         try:
             import firebase_admin
             from firebase_admin import credentials, firestore
             
-            cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-            if cred_path and os.path.exists(cred_path):
-                if not firebase_admin._apps:
-                    cred = credentials.Certificate(cred_path)
-                    firebase_admin.initialize_app(cred)
-                self.firestore_db = firestore.client()
-                print("[DB] Connected to live Firebase Firestore.")
-            else:
-                self.firestore_db = None
+            if not firebase_admin._apps:
+                cred = credentials.Certificate(cred_path)
+                firebase_admin.initialize_app(cred)
+            self.firestore_db = firestore.client()
+            print("[DB] Connected to live Firebase Firestore.")
         except Exception as e:
+            print(f"[DB Warning] Could not initialize Firestore: {e}. Using local JSON storage.")
             self.firestore_db = None
 
     def _load_local_db(self):

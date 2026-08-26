@@ -148,9 +148,8 @@ async def explain_step(
     current_step = RoadmapStep(**step_dict)
     target_role = roadmap_doc.get("target_role", "Software Engineer")
 
-    explanation = current_step.explanation
-    if not explanation:
-        explanation = generate_grounded_explanation(current_step, target_role, all_steps)
+    # Generate or refine grounded explanation with Gemini on-demand
+    explanation = generate_grounded_explanation(current_step, target_role, all_steps)
 
     grounded_facts = {
         "target_role": target_role,
