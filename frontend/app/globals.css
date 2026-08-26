@@ -57,3 +57,93 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #334155;
 }
+
+/* Orbit background animations */
+@keyframes orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit-spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes orbit-counter-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes orbit-counter-spin-reverse {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-orbit-slow {
+  animation: orbit-spin 100s linear infinite;
+}
+
+.animate-orbit-medium {
+  animation: orbit-spin-reverse 75s linear infinite;
+}
+
+.animate-orbit-fast {
+  animation: orbit-spin 55s linear infinite;
+}
+
+.animate-counter-slow {
+  animation: orbit-counter-spin 100s linear infinite;
+}
+
+.animate-counter-medium {
+  animation: orbit-counter-spin-reverse 75s linear infinite;
+}
+
+.animate-counter-fast {
+  animation: orbit-counter-spin 55s linear infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float-gentle 6s ease-in-out infinite;
+}
+
