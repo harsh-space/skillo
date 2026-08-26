@@ -114,57 +114,70 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
 
       <form onSubmit={handleSubmit}>
 
-        {/* Single Dynamic Block Space */}
-        <div className="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800/80 min-h-[320px] flex flex-col justify-between shadow-2xl relative">
+        {/* Single Dynamic Block Space with Consistent Fixed Height */}
+        <div className="glass-card rounded-2xl p-6 sm:p-7 border border-slate-800/80 h-[290px] sm:h-[300px] flex flex-col justify-between shadow-2xl relative overflow-hidden">
           
           {/* Section 1: Tell us about yourself */}
           {activeStep === 0 && (
-            <div className="space-y-4 animate-in fade-in duration-200">
-              <div className="flex items-center gap-2.5 text-slate-100 font-bold text-lg">
-                <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
-                  <User className="w-4 h-4" />
+            <div className="flex flex-col justify-between h-full animate-in fade-in duration-200">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2.5 text-slate-100 font-bold text-lg">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <span>Tell us about yourself</span>
                 </div>
-                <span>Tell us about yourself</span>
               </div>
-              <div className="pt-2">
-                <input
-                  type="text"
-                  value={learnerName}
-                  onChange={(e) => setLearnerName(e.target.value)}
-                  className="w-full bg-slate-900/90 border border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none transition-colors"
-                  placeholder="Your Name"
-                  autoFocus
-                />
+              <div className="my-auto">
+                <div className="relative">
+                  <User className="w-4 h-4 absolute left-4 top-4 text-slate-500" />
+                  <input
+                    type="text"
+                    value={learnerName}
+                    onChange={(e) => setLearnerName(e.target.value)}
+                    className="w-full bg-slate-900/90 border border-slate-700 focus:border-indigo-500 rounded-xl pl-11 pr-4 py-3.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none transition-colors"
+                    placeholder="Your Name"
+                    autoFocus
+                  />
+                </div>
+              </div>
+              <div className="text-[11px] text-slate-500">
+                Step 1 of 3 · Profile Setup
               </div>
             </div>
           )}
 
           {/* Section 2: Tell us about aspiration */}
           {activeStep === 1 && (
-            <div className="space-y-4 animate-in fade-in duration-200">
-              <div className="flex items-center gap-2.5 text-slate-100 font-bold text-lg">
-                <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
-                  <Brain className="w-4 h-4" />
+            <div className="flex flex-col justify-between h-full animate-in fade-in duration-200">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2.5 text-slate-100 font-bold text-lg">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                    <Brain className="w-4 h-4" />
+                  </div>
+                  <span>Tell us about aspiration</span>
                 </div>
-                <span>Tell us about aspiration</span>
               </div>
-              <div className="pt-2">
+              <div className="my-auto">
                 <textarea
-                  rows={4}
+                  rows={3}
                   value={goalText}
                   onChange={(e) => setGoalText(e.target.value)}
-                  className="w-full bg-slate-900/90 border border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none transition-colors resize-none"
+                  className="w-full bg-slate-900/90 border border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none transition-colors resize-none h-[110px]"
                   placeholder="Career Goal & Desired Focus"
                   autoFocus
                 />
               </div>
+              <div className="text-[11px] text-slate-500">
+                Step 2 of 3 · Intent & Career Mapping
+              </div>
             </div>
           )}
 
-
           {/* Section 3: Tell us about your current skillset */}
           {activeStep === 2 && (
-            <div className="space-y-4 animate-in fade-in duration-200">
+            <div className="flex flex-col justify-between h-full animate-in fade-in duration-200">
+              {/* Section Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 text-slate-100 font-bold text-lg">
                   <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
@@ -172,26 +185,25 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
                   </div>
                   <span>Tell us about your current skillset</span>
                 </div>
-                <span className="text-xs text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full font-medium border border-indigo-500/20">
+                <span className="text-[11px] text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full font-medium border border-indigo-500/20">
                   {selectedSkills.length} selected
                 </span>
               </div>
 
               {/* Search Box */}
-              <div className="relative pt-1">
-
-                <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-500" />
+              <div className="relative my-2">
+                <Search className="w-3.5 h-3.5 absolute left-3.5 top-2.5 text-slate-500" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search taxonomy skills (e.g., Python, SQL, Docker)..."
-                  className="w-full bg-slate-900/90 border border-slate-700 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                  placeholder="Filter skills (e.g., Python, SQL, Docker)..."
+                  className="w-full bg-slate-900/90 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
-              {/* Skill Badges */}
-              <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-1">
+              {/* Skill Badges Scroll Area - precisely fitted to prevent jumping */}
+              <div className="flex flex-wrap gap-1.5 h-[120px] overflow-y-auto pr-1">
                 {(filteredSkills.length > 0 ? filteredSkills : allSkills).map((skill) => {
                   const isSelected = selectedSkills.includes(skill.name);
                   return (
@@ -199,21 +211,26 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
                       key={skill.skill_id}
                       type="button"
                       onClick={() => toggleSkill(skill.name)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                         isSelected
                           ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
                           : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
                       }`}
                     >
-                      {isSelected && <CheckCircle className="w-3.5 h-3.5 text-indigo-200" />}
+                      {isSelected && <CheckCircle className="w-3 h-3 text-indigo-200" />}
                       {skill.name}
                     </button>
                   );
                 })}
               </div>
+
+              <div className="text-[11px] text-slate-500 pt-1">
+                Step 3 of 3 · Gap Vector Calculation
+              </div>
             </div>
           )}
         </div>
+
 
         {/* 3 Unified Action Buttons at the Bottom Right */}
         <div className="flex items-center justify-end gap-2.5 mt-5">
