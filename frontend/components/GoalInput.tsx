@@ -86,15 +86,20 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
       {/* Header */}
-      <div className="text-center mb-10">
-        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent mb-3">
-
+      <div className="text-center mb-10 space-y-3">
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
           AI Personalized Learning Assistant
         </h1>
-        <p className="text-slate-400 text-base max-w-2xl mx-auto">
-          Tell us where you are today and where you want to go. Our AI analyzes your skill gap, builds a DAG prerequisite roadmap, and adapts as you learn.
-        </p>
+        <div className="max-w-2xl mx-auto pt-1">
+          <p className="text-base sm:text-lg font-medium text-slate-200 tracking-tight">
+            Map your skills. <span className="bg-gradient-to-r from-indigo-300 to-cyan-300 bg-clip-text text-transparent font-semibold">Chart your path.</span>
+          </p>
+          <p className="text-sm sm:text-base text-slate-400 mt-1">
+            Our AI bridges the gap with an adaptive, milestone-driven roadmap.
+          </p>
+        </div>
       </div>
+
 
       <form onSubmit={handleSubmit} className="space-y-8">
 
