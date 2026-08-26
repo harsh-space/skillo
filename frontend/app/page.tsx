@@ -36,16 +36,12 @@ export default function Home() {
       {/* Top Brand Header */}
       <header className="border-b border-slate-800/80 bg-slate-950/40 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img
-              src="/logo.png"
-              alt="Skillo AI Logo"
-              className="w-9 h-9 object-contain drop-shadow"
-            />
-            <div>
-              <span className="font-extrabold text-base text-white tracking-tight">Skillo AI</span>
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="font-black text-lg bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent tracking-tight">
+              Skillo AI
+            </span>
           </div>
+
         </div>
       </header>
 

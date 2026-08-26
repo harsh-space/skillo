@@ -102,9 +102,10 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
       {/* Header */}
       <div className="text-center mb-10">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-4 shadow-sm">
-          <img src="/logo.png" alt="Skillo AI" className="w-4 h-4 object-contain" />
+          <Sparkles className="w-3.5 h-3.5" />
           <span>Skillo AI · Next-Gen Career Roadmap Assistant</span>
         </div>
+
         <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent mb-3">
           AI Personalized Learning Assistant
         </h1>
