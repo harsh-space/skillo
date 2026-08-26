@@ -95,12 +95,13 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
   );
 
   return (
-    <div className="max-w-3xl mx-auto py-8 px-4">
+    <div className="max-w-4xl mx-auto py-8 px-4">
       {/* Header */}
       <div className="text-center mb-8 space-y-3">
-        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent whitespace-normal sm:whitespace-nowrap">
           AI Personalized Learning Assistant
         </h1>
+
         <div className="max-w-2xl mx-auto pt-1">
           <p className="text-base sm:text-lg font-medium text-slate-200 tracking-tight">
             Map your skills. <span className="bg-gradient-to-r from-indigo-300 to-cyan-300 bg-clip-text text-transparent font-semibold">Chart your path.</span>
