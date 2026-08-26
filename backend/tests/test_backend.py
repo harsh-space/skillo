@@ -12,7 +12,7 @@ if BACKEND_DIR not in sys.path:
 
 import pytest
 from app.services.db import db
-from app.services.goal_parser import _rule_based_parse
+from app.services.goal_parser import _semantic_embed_parse
 from app.services.gap_analysis import run_gap_analysis
 from app.services.path_generator import generate_learning_path, build_prerequisite_graph
 from app.services.xai import generate_grounded_explanation
@@ -43,7 +43,7 @@ def test_goal_parsing_worked_example():
     skills = db.list_documents("skills")
     goal_text = "I want to become a backend developer"
     
-    parsed = _rule_based_parse(goal_text, roles, skills)
+    parsed = _semantic_embed_parse(goal_text, roles, skills)
     assert parsed.target_role == "Backend Developer"
     assert parsed.target_role_id == "role_backend_developer"
     assert len(parsed.target_skills) > 0

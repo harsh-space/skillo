@@ -82,14 +82,18 @@ Feedback Events ─────────► [ 5. Adaptive Loop ] ────
 ### 4. Explainable AI (XAI) Engine (`xai.py`)
 
 * **What it is supposed to do:** Give a plain-language answer to *"Why is this course recommended at this step?"* without hallucinating fake facts.
-* **Exact Mechanics in V1 (Fact-Grounded Synthesis):**
-  1. Extracts 4 exact structural facts from the computed graph and gap analysis:
-     * **Upstream Predecessors:** $\text{Pred}(s) \cap \text{RoadmapPath}$
-     * **Downstream Dependents:** $\{d \in \text{RoadmapPath} \mid s \in \text{Pred}(d)\}$
-     * **Gap Similarity Score:** Distance metric computed in Step 2.
-     * **Target Role:** Stated career objective.
-  2. Synthesizes a grounded template sentence binding these exact nodes:
-     > *"Recommended after [Predecessors] and before [Dependents] — [Skill] is a direct prerequisite for building the [First Dependent] module in your target role, and closes a skill gap identified from your goal."*
+* **Exact Mechanics in V1.1 (Fact-Grounded Gemini AI Synthesis + Graph Fallback):**
+  1. **Graph Fact Extraction:** Extracts 4 verified structural constraints from the learner's DAG roadmap:
+     * **Direct Upstream Prerequisites:** Completed foundation nodes (e.g. `Python (advanced)`, `SQL`).
+     * **Downstream Milestones Unlocked:** Subsequent topics enabled by this node (e.g. `Authentication & JWT`, `Docker`).
+     * **Career Target Role:** Stated objective (e.g. `Backend Developer`).
+     * **Remedial Flag:** Identifies whether this is a regular progression or an active remedial insertion.
+  2. **Grounded Gemini LLM Synthesis:**
+     * Sends the exact extracted structural facts into **Gemini (`gemini-3-flash-preview` / `gemini-flash-latest`)** with strict zero-hallucination prompt constraints.
+     * Generates a natural, deeply contextual mentor rationale:
+       > *"Building on your advanced Python and SQL foundations, learning REST APIs allows you to transform backend data logic into the standardized web services essential for your target role. This placement serves as a critical bridge, providing the necessary architectural framework required before you move on to securing services with JWT and containerizing them via Docker."*
+  3. **Deterministic Fallback:** If offline or API key is absent, the deterministic graph template generates the rationale directly from graph edges.
+
 
 ---
 

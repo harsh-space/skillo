@@ -41,6 +41,12 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
                 role_vector = model.encode(role_semantic_text)
                 sim = _compute_cosine_similarity(goal_vector, role_vector)
                 
+                # Boost if the exact role title words are present in the goal
+                if r["name"].lower() in goal_text.lower():
+                    sim += 0.30
+                elif any(word in goal_text.lower() for word in r["name"].lower().split() if len(word) > 3):
+                    sim += 0.10
+                
                 if sim > best_sim:
                     best_sim = sim
                     best_role = r

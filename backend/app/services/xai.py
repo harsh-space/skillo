@@ -6,25 +6,18 @@ from app.services.db import db
 from app.models.schemas import RoadmapStep, ExplanationResponse
 
 
-def generate_grounded_explanation(
+def _template_grounded_explanation(
     step: RoadmapStep,
     target_role_name: str,
     all_steps: List[RoadmapStep]
 ) -> str:
-    """
-    Generates a fact-grounded explanation based on prerequisite DAG edges,
-    target career role, and gap similarity score.
-    """
-    # 1. Upstream prerequisites in the path
+    """Deterministic fact-grounded template fallback based on DAG graph relationships."""
     step_index = step.step - 1
     upstream_in_path = [s.skill_name for s in all_steps[:step_index]]
     relevant_prereqs = [p for p in step.prerequisites if p in upstream_in_path]
-    
-    # 2. Downstream dependents in the path
     downstream_in_path = [s for s in all_steps[step_index + 1:] if step.skill_name in s.prerequisites]
     downstream_names = [d.skill_name for d in downstream_in_path]
 
-    # 3. Grounded rationale synthesis
     if step.is_remedial:
         return (
             f"Remedial milestone inserted: targeted refresher for {step.skill_name} "
@@ -32,14 +25,10 @@ def generate_grounded_explanation(
         )
 
     explanation_parts = []
-    
-    # Prerequisite positioning
     if relevant_prereqs and downstream_names:
         prereq_str = ", ".join(relevant_prereqs)
         downstream_str = ", ".join(downstream_names)
-        explanation_parts.append(
-            f"Recommended after {prereq_str} and before {downstream_str}"
-        )
+        explanation_parts.append(f"Recommended after {prereq_str} and before {downstream_str}")
     elif relevant_prereqs:
         prereq_str = ", ".join(relevant_prereqs)
         explanation_parts.append(f"Recommended after mastering {prereq_str}")
@@ -49,7 +38,6 @@ def generate_grounded_explanation(
     else:
         explanation_parts.append(f"Core competency for {target_role_name}")
 
-    # Functional dependency
     if downstream_names:
         first_downstream = downstream_names[0]
         explanation_parts.append(
@@ -62,6 +50,70 @@ def generate_grounded_explanation(
         )
 
     return " ".join(explanation_parts)
+
+
+def generate_grounded_explanation(
+    step: RoadmapStep,
+    target_role_name: str,
+    all_steps: List[RoadmapStep]
+) -> str:
+    """
+    Generates a fact-grounded explanation based on prerequisite DAG edges,
+    target career role, and gap similarity score. Uses Gemini with strict structural
+    constraints, falling back to deterministic graph template synthesis.
+    """
+    # 1. Upstream prerequisites in the path
+    step_index = step.step - 1
+    upstream_in_path = [s.skill_name for s in all_steps[:step_index]]
+    relevant_prereqs = [p for p in step.prerequisites if p in upstream_in_path]
+    
+    # 2. Downstream dependents in the path
+    downstream_in_path = [s for s in all_steps[step_index + 1:] if step.skill_name in s.prerequisites]
+    downstream_names = [d.skill_name for d in downstream_in_path]
+
+    # 3. Try Gemini LLM Grounded Synthesis if GEMINI_API_KEY is available
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    if gemini_key:
+        try:
+            from google import genai
+            client = genai.Client(api_key=gemini_key)
+
+            prereq_str = ", ".join(relevant_prereqs) if relevant_prereqs else "None (Foundational Entry Point)"
+            downstream_str = ", ".join(downstream_names) if downstream_names else "Final Target Role Capstone"
+            remedial_note = "Note: This is an active remedial refresher module inserted after an assessment gap." if step.is_remedial else ""
+
+            prompt = f"""You are an Explainable AI (XAI) learning path mentor.
+Given these STRICT, verified structural facts from the learner's DAG roadmap:
+- Recommended Skill: {step.skill_name}
+- Step Number: {step.step} of {len(all_steps)}
+- Target Role: {target_role_name}
+- Direct Upstream Prerequisites: {prereq_str}
+- Downstream Modules Unlocked: {downstream_str}
+{remedial_note}
+
+Write a natural, insightful, 2-sentence explanation answering "Why is this skill recommended at this exact step?".
+Rules:
+1. Ground the explanation strictly in the upstream prerequisites and downstream unlocked topics provided above (do not invent unlisted prerequisites).
+2. Connect how this skill bridges foundational knowledge to practical application in the target role.
+3. Output ONLY the 2-sentence rationale with no surrounding quotes or meta-commentary."""
+
+            for model_name in ['gemini-3-flash-preview', 'gemini-flash-latest']:
+                try:
+                    response = client.models.generate_content(
+                        model=model_name,
+                        contents=prompt
+                    )
+                    text = response.text.strip()
+                    if text and len(text) > 20:
+                        return text
+                except Exception:
+                    continue
+        except Exception as e:
+            print(f"[XAI Service] Gemini XAI synthesis failed: {e}")
+
+    # Fallback to deterministic template
+    return _template_grounded_explanation(step, target_role_name, all_steps)
+
 
 
 async def explain_step(
