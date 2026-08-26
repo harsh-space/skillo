@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Brain, ArrowRight, CheckCircle, Search, Layers, User, Zap } from 'lucide-react';
+import { Sparkles, Brain, ArrowRight, CheckCircle, Search, Layers, User } from 'lucide-react';
 import { Skill, fetchTaxonomy, saveProfile, parseGoal } from '../lib/api';
 
 interface GoalInputProps {
@@ -38,20 +38,6 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
       setSelectedSkills(selectedSkills.filter((s) => s !== skillName));
     } else {
       setSelectedSkills([...selectedSkills, skillName]);
-    }
-  };
-
-  const applyPreset = (preset: 'alex' | 'sam') => {
-    if (preset === 'alex') {
-      setLearnerId('learner_alex');
-      setLearnerName('Alex');
-      setSelectedSkills(['HTML', 'CSS', 'Python (basic)']);
-      setGoalText('I want to become a backend developer');
-    } else {
-      setLearnerId('learner_sam');
-      setLearnerName('Sam');
-      setSelectedSkills(['JavaScript', 'React', 'HTML', 'CSS']);
-      setGoalText('I want to become a Full Stack Developer');
     }
   };
 
@@ -110,39 +96,8 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
         </p>
       </div>
 
-      {/* Preset Personas Bar */}
-      <div className="glass-card rounded-2xl p-4 mb-8 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2 text-sm text-slate-300">
-          <Zap className="w-4 h-4 text-amber-400" />
-          <span className="font-semibold text-slate-200">Worked Persona Scenarios:</span>
-        </div>
-        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-          <button
-            type="button"
-            onClick={() => applyPreset('alex')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-              learnerId === 'learner_alex'
-                ? 'bg-primary-600/30 border-primary-500 text-white shadow-sm shadow-primary-500/20'
-                : 'bg-slate-800/60 border-slate-700 text-slate-300 hover:border-slate-600'
-            }`}
-          >
-            🎯 Persona A (Alex): HTML + CSS + Python → Backend Dev
-          </button>
-          <button
-            type="button"
-            onClick={() => applyPreset('sam')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-              learnerId === 'learner_sam'
-                ? 'bg-primary-600/30 border-primary-500 text-white shadow-sm shadow-primary-500/20'
-                : 'bg-slate-800/60 border-slate-700 text-slate-300 hover:border-slate-600'
-            }`}
-          >
-            ⚡ Persona B (Sam): JS + React → Full Stack Dev
-          </button>
-        </div>
-      </div>
-
       <form onSubmit={handleSubmit} className="space-y-8">
+
         {/* Learner Info */}
         <div className="glass-card rounded-2xl p-6 border border-slate-800/80">
           <div className="flex items-center gap-2 mb-4 text-slate-200 font-semibold">
