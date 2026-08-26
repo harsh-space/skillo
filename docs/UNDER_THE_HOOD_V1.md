@@ -1,6 +1,6 @@
-# Pathfinder AI (V1 → V1.1) — Under The Hood Technical Breakdown
+# Skillo AI (V1 → V1.1) — Under The Hood Technical Breakdown
 
-This document provides a transparent, no-sugarcoat technical explanation of **how every subsystem in V1 actually works under the hood**, what algorithms are executed, where genuine ML vs. heuristic fallbacks run, and why certain edge cases behave the way they do.
+This document provides a transparent, comprehensive technical explanation of **how every subsystem in Skillo AI works under the hood**, detailing the exact algorithms executed, ML vs. deterministic fallbacks, graph operations, database persistence, and frontend visual animation architecture.
 
 ---
 
@@ -8,15 +8,19 @@ This document provides a transparent, no-sugarcoat technical explanation of **ho
 
 ```
 Raw Free-Text Goal ──────► [ 1. Intent Extraction ] ─────► Target Role & Skills
-                                │ (LLM / Keyword / Cosine)
+                                │ (Google GenAI Gemini SDK / Dense Cosine Embedding)
 Learner Stated Skills ───► [ 2. Skill Gap Engine ] ──────► Matched vs. Missing Gap Vectors
-                                │ (sentence-transformers embeddings)
+                                │ (sentence-transformers embeddings, tau = 0.60)
 Taxonomy DAG Edges ──────► [ 3. Path Generation ] ──────► Topologically Ordered Sequence
                                 │ (NetworkX Closure + Topological Sort)
 Upstream/Downstream Facts► [ 4. Explainability (XAI) ] ──► Fact-Grounded Justification
-                                │ (Graph metadata template synthesis)
+                                │ (Gemini LLM Synthesis / Graph metadata template)
 Feedback Events ─────────► [ 5. Adaptive Loop ] ────────► Dynamic Path Mutation
-                                │ (Heuristic re-ranking rules)
+                                │ (Heuristic re-ranking rules: Remedial/Skip/Advance)
+Database Layer ──────────► [ 6. Persistence Engine ] ───► Live Firestore / JSON Storage
+                                │ (Lazy credential load & zero-config fallback)
+Frontend UX ─────────────► [ 7. Visual Carousel & Orbit]► 2-Step Wizard & Tech Constellation
+                                │ (Synchronized slide track + CSS orbital physics)
 ```
 
 ---
@@ -25,96 +29,130 @@ Feedback Events ─────────► [ 5. Adaptive Loop ] ────
 
 ### 1. Goal Extraction & Intent Parsing (`goal_parser.py`)
 
-* **What it is supposed to do:** Translate unstructured natural language (e.g. *"I want to do backend system architecture"*) into a discrete target role (`role_backend_developer`) and required competencies.
-* **Exact Mechanics in V1:**
-  1. **Primary Route:** If an `OPENAI_API_KEY` or `GEMINI_API_KEY` environment variable is detected, it issues an async HTTP prompt with a JSON schema constraint, requiring the LLM to choose strictly from the seeded role taxonomy.
-  2. **Fallback Route (Local Mode / No API Key):** It runs a token-intersection keyword heuristic (`_rule_based_parse`) with bonus weights for role keywords (`backend`, `frontend`, `cloud/devops`, `ml/ai`).
-* **Why the DevOps example stumbled in the original V1:**
-  * Query: *"I'm a sophomore who **hates writing frontend CSS** and wants to automate cloud infrastructure, build CI/CD pipelines..."*
-  * **Failure Reason:** In the original keyword heuristic (`_rule_based_parse`), the word `"frontend"` appeared in the input text. An `if/elif` chain gave `Frontend Developer` a `+5` bonus before even checking the DevOps clause — completely ignoring the negative sentiment (*"hates writing"*). First `elif` branch wins; no sentiment scoring at all.
-  * **V1.1 Fix Applied:** Replaced `_rule_based_parse` with `_semantic_embed_parse` which:
-    1. Loads the already-cached `all-MiniLM-L6-v2` model (zero additional dependency).
-    2. Constructs a **rich role context string**: `"Career Role: <Name>. <Description>. Core competencies: <Skills>."` for each role.
-    3. Encodes both the query and each role context into 384-dim dense vectors.
-    4. Computes pairwise cosine similarity and selects the argmax role.
-    5. Returns the matched role with its similarity score for transparency.
+* **What it does:** Translates unstructured natural language career goals (e.g. *"I want to build backend systems, databases, caching and REST APIs"*) into a discrete target role (`role_backend_developer`) and required skill competencies from the taxonomy.
+* **Exact Execution Hierarchy:**
+  1. **Primary Route (Google GenAI Gemini SDK):**
+     * When `GEMINI_API_KEY` is present, it uses the official `google-genai` SDK (`google.genai.Client`) with model `gemini-flash-latest`.
+     * Passes a structured JSON schema prompt constraining the LLM output strictly to available taxonomy roles:
+       $$\text{JSON Schema: } \{\text{target\_role}, \text{intent\_summary}\}$$
+     * Cleanly handles key formats (including both legacy `AIza*` and standard API keys).
+  2. **Secondary Route (OpenAI API):**
+     * If `OPENAI_API_KEY` is available, issues a structured JSON classification query (`gpt-3.5-turbo`).
+  3. **Local Semantic Embedding Fallback (`_semantic_embed_parse`):**
+     * Runs zero-API-key local intent extraction using `sentence-transformers` (`all-MiniLM-L6-v2`).
+     * Constructs a rich contextual string for each candidate role:
+       $$\text{Role Context} = \text{"Career Role: } R_{\text{name}} \text{. } R_{\text{desc}} \text{ Core competencies: } S_1, S_2, \dots S_n\text{"}$$
+     * Encodes the user query and all role contexts into 384-dimensional dense vector space.
+     * Computes cosine similarity and applies a title match keyword bonus ($+0.30$ for exact role name match, $+0.10$ for keyword match):
+       $$\text{Score}(R) = \text{CosineSim}(\mathbf{v}_{\text{query}}, \mathbf{v}_{\text{role}}) + \text{Bonus}(R)$$
+  4. **Token Overlap Fallback:**
+     * If embedding models are unavailable, computes token intersection scores between goal query terms and role skill requirements.
 
-* **V1.1 Verified Test Results (run on local model, no API key):**
+* **Verified Semantic Test Results:**
 
-  | Query | Matched Role | Cosine Score |
+  | Query | Matched Role | Score / Method |
   |---|---|---|
-  | *"...hates CSS, wants CI/CD pipelines and container clusters"* | **DevOps Engineer** | 0.51 ✅ |
-  | *"...train neural networks, PyTorch, only know basic math"* | **Machine Learning Engineer** | 0.33 ✅ |
-  | *"...full end-to-end web apps, client-side UI and server databases"* | **Full Stack Developer** | 0.41 ✅ |
-  | *"...backend systems, databases, caching and REST APIs"* | **Backend Developer** | 0.48 ✅ |
+  | *"...hates CSS, wants CI/CD pipelines and container clusters"* | **DevOps Engineer** | 0.51 (Cosine) ✅ |
+  | *"...train neural networks, PyTorch, only know basic math"* | **Machine Learning Engineer** | 0.33 (Cosine) ✅ |
+  | *"...full end-to-end web apps, client-side UI and server databases"* | **Full Stack Developer** | 0.41 (Cosine) ✅ |
+  | *"...backend systems, databases, caching and REST APIs"* | **Backend Developer** | 0.48 (Cosine) ✅ |
 
 ---
 
 ### 2. Skill Gap Vector Analysis (`gap_analysis.py`)
 
-* **What it is supposed to do:** Compare the learner's existing skills against the target role's required skills to determine which competencies are already mastered vs. missing.
-* **Exact Mechanics in V1 (Genuine ML Layer):**
-  1. **Embedding Model:** Uses `sentence-transformers` (`all-MiniLM-L6-v2`), generating a 384-dimensional dense semantic vector for every skill name + description.
-  2. **Cosine Similarity Matrix:**
-     $$\text{Cosine Similarity}(u, v) = \frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\|_2 \|\mathbf{v}\|_2}$$
-  3. **Thresholding ($\tau = 0.60$):**
-     * If $\max_{s \in \text{learner}}(\text{similarity}(r, s)) \ge 0.60 \implies$ **Matched Skill** (Learner already knows an equivalent concept).
-     * If $\max_{s \in \text{learner}}(\text{similarity}(r, s)) < 0.60 \implies$ **Missing Skill** (Flagged as an active competency gap).
-  4. **Special Domain Constraints:** Explicitly distinguishes `Python (basic)` from `Python (advanced)` (similarity clamped at $0.52$) so basic Python does not falsely satisfy advanced asynchronous/OOP backend requirements.
+* **What it does:** Compares the learner's existing skills against the target role's required skills to compute matched competencies versus missing skill gap vectors.
+* **Exact Mechanics (Dense Vector Embedding Layer):**
+  1. **Embedding Generator:** Uses `sentence-transformers` (`all-MiniLM-L6-v2`), generating a 384-dimensional dense semantic vector for every skill name + description.
+  2. **Cosine Similarity Computation:**
+     $$\text{Cosine Similarity}(\mathbf{u}, \mathbf{v}) = \frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\|_2 \|\mathbf{v}\|_2}$$
+  3. **Threshold Decision ($\tau = 0.60$):**
+     * $\max_{s \in \text{learner}}(\text{similarity}(r, s)) \ge 0.60 \implies$ **Matched Skill** (Learner already possesses this or an equivalent concept).
+     * $\max_{s \in \text{learner}}(\text{similarity}(r, s)) < 0.60 \implies$ **Missing Skill** (Flagged as an active learning gap).
+  4. **Skill Level Distinction Clamping:** Explicitly distinguishes skill depth (e.g. `Python (basic)` vs `Python (advanced)` similarity is clamped at $0.52$) to prevent introductory knowledge from satisfying advanced backend requirements.
 
 ---
 
 ### 3. Path Generation & Prerequisite Closure (`path_generator.py`)
 
-* **What it is supposed to do:** Order the missing skills into a strictly valid study sequence that respects dependency prerequisites.
-* **Exact Mechanics in V1 (Graph Theory / DAG):**
-  1. **Graph Construction:** Builds a `networkx.DiGraph` from 35 directed edges (e.g. `Python` $\to$ `REST APIs` $\to$ `Authentication`).
-  2. **Prerequisite Closure Resolution:**
-     * For every missing skill $s$, it computes all directed graph ancestors:
+* **What it does:** Takes the missing skill vector and builds a topologically ordered learning sequence that respects prerequisite constraints.
+* **Exact Mechanics (Directed Acyclic Graph / DAG):**
+  1. **Graph Instantiation:** Constructs a `networkx.DiGraph` from 35+ directed prerequisite edges (e.g. `Python (basic)` $\to$ `REST APIs` $\to$ `Authentication & JWT`).
+  2. **Transitive Prerequisite Closure:**
+     * For every identified missing skill $s$, computes all directed graph ancestors:
        $$\text{Ancestors}(s) = \{a \in V \mid a \leadsto s\}$$
-     * If an ancestor $a$ is **not** in the learner's mastered set, $a$ is automatically pulled into the learning path even if not explicitly part of the role definition.
-  3. **Topological Sort:**
-     * Executes `networkx.topological_sort(subgraph)` to ensure for every directed edge $(u, v)$, skill $u$ strictly precedes skill $v$.
-  4. **Resource Binding:** Iterates over the sorted nodes and queries the `resources` collection to attach curated courses and project checkpoints.
+     * If ancestor $a$ is missing from the learner's mastered set, it is automatically injected into the roadmap to prevent prerequisite gaps.
+  3. **Topological Ordering:**
+     * Runs `networkx.topological_sort(subgraph)` ensuring that for every edge $(u, v)$, skill $u$ strictly precedes skill $v$.
+  4. **Resource Binding:** Binds each sorted node to curated learning resources (courses, documentation, project checkpoints) stored in the database.
 
 ---
 
 ### 4. Explainable AI (XAI) Engine (`xai.py`)
 
-* **What it is supposed to do:** Give a plain-language answer to *"Why is this course recommended at this step?"* without hallucinating fake facts.
-* **Exact Mechanics in V1.1 (Fact-Grounded Gemini AI Synthesis + Graph Fallback):**
-  1. **Graph Fact Extraction:** Extracts 4 verified structural constraints from the learner's DAG roadmap:
-     * **Direct Upstream Prerequisites:** Completed foundation nodes (e.g. `Python (advanced)`, `SQL`).
-     * **Downstream Milestones Unlocked:** Subsequent topics enabled by this node (e.g. `Authentication & JWT`, `Docker`).
-     * **Career Target Role:** Stated objective (e.g. `Backend Developer`).
-     * **Remedial Flag:** Identifies whether this is a regular progression or an active remedial insertion.
+* **What it does:** Answers *"Why is this skill recommended at this exact step?"* with fact-grounded explanations.
+* **Exact Mechanics (Google GenAI Gemini Synthesis + Graph Fallback):**
+  1. **Structural Fact Extraction:** Extracts 4 graph facts from the DAG roadmap:
+     * **Upstream Prerequisites:** Completed foundation nodes (e.g. `Python (advanced)`, `SQL & Relational Databases`).
+     * **Downstream Milestones Unlocked:** Subsequent skills enabled by this step (e.g. `Authentication & JWT`, `Docker & Containers`).
+     * **Target Role:** Stated career objective (e.g. `Backend Developer`).
+     * **Remedial Flag:** Identifies whether the node is a standard progression or an active remedial insertion.
   2. **Grounded Gemini LLM Synthesis:**
-     * Sends the exact extracted structural facts into **Gemini (`gemini-3-flash-preview` / `gemini-flash-latest`)** with strict zero-hallucination prompt constraints.
-     * Generates a natural, deeply contextual mentor rationale:
-       > *"Building on your advanced Python and SQL foundations, learning REST APIs allows you to transform backend data logic into the standardized web services essential for your target role. This placement serves as a critical bridge, providing the necessary architectural framework required before you move on to securing services with JWT and containerizing them via Docker."*
-  3. **Deterministic Fallback:** If offline or API key is absent, the deterministic graph template generates the rationale directly from graph edges.
-
+     * Issues an async prompt to **Gemini (`gemini-3-flash-preview` / `gemini-flash-latest`)** via the `google-genai` SDK with zero-hallucination rules.
+     * Generates a 2-sentence rationale grounded strictly in the extracted graph facts:
+       > *"Building on your Python and SQL foundations, mastering REST APIs enables you to expose backend data services required for your Backend Developer goal. This unlocks subsequent modules in Authentication & JWT and containerized deployment with Docker."*
+  3. **Deterministic Fallback:** If offline or without an API key, `_template_grounded_explanation` synthesizes the rationale directly from graph edge relationships.
 
 ---
 
 ### 5. Adaptive Feedback Loop (`feedback.py`)
 
-* **What it is supposed to do:** Re-rank or adjust the roadmap when assessment scores or completions occur.
-* **Exact Mechanics in V1 (Rule-Based Heuristic):**
-  * As explicitly scoped in `context.md` §5 & `PRD.md` §7, the hackathon rules deliberately permit rule-based heuristics over training reinforcement learning from scratch:
-    * **Rule 1 (Score $< 50\%$):** Intercepts low score, queries `seed_resources.json` for a `is_remedial: true` refresher module, and mutates the array to insert a remedial step immediately at $\text{index} + 1$.
-    * **Rule 2 (Score $\ge 90\%$):** Flags downstream dependent steps as accelerated/skippable.
-    * **Rule 3 (Completed / Score $50\text{--}89\%$):** Appends skill to `current_skills`, advances pointer to the next topological node, and persists the updated document.
+* **What it does:** Dynamically mutates the learning path when assessment results or completions occur.
+* **Exact Mechanics (Rule-Based Adaptive Engine):**
+  * **Rule 1 (Quiz Score $< 50\%$):** Intercepts low comprehension, fetches a `is_remedial: true` refresher module from taxonomy, and injects a remedial step at $\text{index} + 1$.
+  * **Rule 2 (Quiz Score $\ge 90\%$):** Flags downstream dependent steps as accelerated/skippable.
+  * **Rule 3 (Completion / Score $50\text{--}89\%$):** Adds skill to `current_skills`, advances active step pointer, and persists updated roadmap state.
 
 ---
 
-## 📊 Summary: Genuine ML vs. Rule-Based Modules in V1
+### 6. Persistence & Database Layer (`db.py`)
 
-| Module | Technique Used in V1 | Pure ML or Rule-Based? |
+* **What it does:** Provides dual-mode data persistence for learners, skills, roles, roadmaps, and feedback events.
+* **Exact Mechanics:**
+  1. **Lazy Firestore Initialization:** Checks for `GOOGLE_APPLICATION_CREDENTIALS` file existence before invoking Firebase Admin SDK. Prevents gRPC initialization blocking on local development environments.
+  2. **Transparent Local Fallback:** If Firebase credentials are not configured, transparently reads and writes to `app/data/db_storage.json`.
+  3. **Unified Document API:** Provides consistent `set_document`, `get_document`, `list_documents`, and `update_document` primitives across live Firestore and local storage.
+
+---
+
+### 7. Frontend UX & Motion Engine (`frontend/`)
+
+* **What it does:** Delivers a modern, responsive web application (Next.js 14 + Tailwind CSS + Lucide Icons).
+* **Key Visual Subsystems:**
+  1. **2-Step Onboarding Wizard (`GoalInput.tsx`):**
+     * Fixed-height glassmorphic card (`h-[340px]`).
+     * **Step 1:** Name & Career Goal inputs.
+     * **Step 2:** Skillset badge selector with live search filtering.
+     * Icon-only action buttons (`Sparkles`, `ArrowLeft`, `ArrowRight`) with dynamic `"Step X of 2"` indicator.
+  2. **Synchronized Viewport Carousel Track (`page.tsx`):**
+     * Unified dual-panel slide container (`w-[200%]` width).
+     * On onboarding completion, slides track `-50%` left with `cubic-bezier(0.16, 1, 0.3, 1)` easing.
+     * Simultaneous slide-out of Onboarding and slide-in of Dashboard in perfect lockstep.
+  3. **Background Tech Orbit System (`OrbitBackground.tsx`):**
+     * Concentric orbital rings featuring animated tech badges (Python, React, TypeScript, Next.js, Docker, Rust, Node.js, Go, PyTorch, Kubernetes, Tailwind, GraphQL).
+     * 45 randomized twinkling stars in deep-space starfield.
+     * When transitioning to Dashboard, tech badges smoothly slide left and fade (`opacity-0 -translate-x-24`), while orbit rings drop to 10% opacity, keeping stars active.
+
+---
+
+## 📊 Summary: Genuine ML vs. Rule-Based Modules
+
+| Module | Subsystem Technique | Classification |
 |---|---|---|
-| **Goal Extraction** | V1: LLM API + `if/elif` keyword bonus heuristic fallback | V1: Heuristic (broken on negation/mixed signals) |
-| **Goal Extraction** | **V1.1 Fix**: LLM API + Dense Cosine Similarity over role context embeddings | **V1.1: Hybrid (LLM + Pure ML fallback)** |
-| **Skill Gap Analysis** | `sentence-transformers` (`all-MiniLM-L6-v2`) 384-dim Dense Vector Cosine Similarity ($\tau=0.60$) | **Pure AI/ML** |
-| **Path Generation** | NetworkX `DiGraph` + Transitive Ancestor Closure + `topological_sort` | **Deterministic Graph Theory** |
-| **Explainable AI** | Graph predecessor/successor fact extraction + grounded sentence template | **Fact-Grounded Synthesis** |
-| **Adaptive Feedback** | Score-bracket mutation rules ($<50\%, \ge 90\%, \text{complete}$) — no RL | **Rule-Based Heuristic** |
+| **Goal Extraction** | Google GenAI SDK (`gemini-flash-latest`) + Sentence-Transformers Cosine Similarity (`all-MiniLM-L6-v2`) fallback | **Hybrid (LLM + Pure ML Fallback)** |
+| **Skill Gap Analysis** | `sentence-transformers` 384-dim Dense Vector Cosine Similarity ($\tau=0.60$) | **Pure AI/ML** |
+| **Path Generation** | NetworkX `DiGraph` + Transitive Closure + `topological_sort` | **Deterministic Graph Theory** |
+| **Explainable AI (XAI)** | DAG Graph Fact Extraction + Gemini LLM Grounded Synthesis (`google-genai` SDK) | **Fact-Grounded Synthesis** |
+| **Adaptive Feedback** | Score-bracket mutation rules ($<50\%, \ge 90\%, \text{complete}$) | **Rule-Based Heuristic** |
+| **Database Persistence** | Firebase Firestore + Local JSON Storage Fallback with Lazy Credential Check | **Dual-Mode Persistence** |
+| **Frontend Motion** | Next.js 14 + Tailwind CSS + Dual-Panel Slide Track + Orbital Animations | **Synchronized Motion Engine** |
