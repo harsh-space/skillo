@@ -125,9 +125,6 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
                 </div>
                 <span>Tell us about yourself</span>
               </div>
-              <p className="text-xs text-slate-400">
-                Enter your name or preferred moniker so we can personalize your learning journey and milestones.
-              </p>
               <div className="pt-2">
                 <label className="block text-xs font-medium text-slate-300 mb-2">Your Name</label>
                 <input
@@ -151,9 +148,6 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
                 </div>
                 <span>Tell us about aspiration</span>
               </div>
-              <p className="text-xs text-slate-400">
-                Type your career objective freely. Our AI parses your natural-language intent and maps it to target roles.
-              </p>
               <div className="pt-2">
                 <label className="block text-xs font-medium text-slate-300 mb-2">Career Goal & Desired Focus</label>
                 <textarea
@@ -182,12 +176,10 @@ export default function GoalInput({ onComplete }: GoalInputProps) {
                   {selectedSkills.length} selected
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                Select the skills you already know. The engine calculates cosine similarity gap vectors against these.
-              </p>
 
               {/* Search Box */}
-              <div className="relative">
+              <div className="relative pt-1">
+
                 <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-500" />
                 <input
                   type="text"
