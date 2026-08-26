@@ -10,7 +10,8 @@ LOCAL_DB_FILE = os.path.join(DATA_DIR, "db_storage.json")
 
 class DatabaseClient:
     """
-    Unified database client that connects to Firebase Firestore if configured,
+    Unified database client that connects to Firebase Firestore if configured via
+    GOOGLE_APPLICATION_CREDENTIALS path or FIREBASE_CREDENTIALS_JSON string,
     or transparently falls back to local JSON storage for zero-config execution.
     """
     def __init__(self):
@@ -29,19 +30,26 @@ class DatabaseClient:
 
     def _init_firestore(self):
         cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-        if not cred_path or not os.path.exists(cred_path):
-            self.firestore_db = None
-            return
+        cred_json_str = os.getenv("FIREBASE_CREDENTIALS_JSON")
 
         try:
             import firebase_admin
             from firebase_admin import credentials, firestore
-            
-            if not firebase_admin._apps:
+
+            cred = None
+            if cred_path and os.path.exists(cred_path):
                 cred = credentials.Certificate(cred_path)
-                firebase_admin.initialize_app(cred)
-            self.firestore_db = firestore.client()
-            print("[DB] Connected to live Firebase Firestore.")
+            elif cred_json_str:
+                cred_dict = json.loads(cred_json_str)
+                cred = credentials.Certificate(cred_dict)
+
+            if cred:
+                if not firebase_admin._apps:
+                    firebase_admin.initialize_app(cred)
+                self.firestore_db = firestore.client()
+                print("[DB] Connected to live Firebase Firestore.")
+            else:
+                self.firestore_db = None
         except Exception as e:
             print(f"[DB Warning] Could not initialize Firestore: {e}. Using local JSON storage.")
             self.firestore_db = None
@@ -93,6 +101,26 @@ class DatabaseClient:
         doc = self.get_document(collection, doc_id) or {}
         doc.update(updates)
         self.set_document(collection, doc_id, doc)
+
+    def delete_document(self, collection: str, doc_id: str):
+        if self.firestore_db:
+            try:
+                self.firestore_db.collection(collection).document(doc_id).delete()
+            except Exception:
+                pass
+        if collection in self.local_data and doc_id in self.local_data[collection]:
+            del self.local_data[collection][doc_id]
+            self._save_local_db()
+
+    def query_documents(self, collection: str, field: str, value: Any) -> List[Dict[str, Any]]:
+        if self.firestore_db:
+            try:
+                docs = self.firestore_db.collection(collection).where(field, "==", value).stream()
+                return [d.to_dict() for d in docs]
+            except Exception:
+                pass
+        docs = list(self.local_data.get(collection, {}).values())
+        return [d for d in docs if d.get(field) == value]
 
 
 # Global singleton instance
