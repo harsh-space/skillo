@@ -71,7 +71,7 @@ Skillo AI is built on a modular five-layer architecture designed for high perfor
 </div>
 
 <p align="center">
-  <img src="docs/career_ai_backend_flow_architecture.png" width="650" alt="Skillo AI Backend Flow Architecture"/>
+  <img src="docs/career_ai_architecture_layers.png" width="650" alt="Skillo AI Backend Flow Architecture"/>
   <br/>
   <em>Figure 1: End-to-end backend flow and service interaction architecture</em>
 </p>
@@ -79,7 +79,7 @@ Skillo AI is built on a modular five-layer architecture designed for high perfor
 ### System Telemetry Pipeline
 
 <p align="center">
-  <img src="docs/career_ai_architecture_layers.png" width="650" alt="Skillo AI Architectural Layers"/>
+  <img src="docs/career_ai_backend_flow_architecture.png" width="650" alt="Skillo AI Architectural Layers"/>
   <br/>
   <em>Figure 2: Multi-layer system telemetry and data processing pipeline</em>
 </p>
