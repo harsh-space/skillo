@@ -82,55 +82,116 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
     )
 
 
+async def _try_gemini(goal_text: str, roles, skills) -> GoalParseResponse | None:
+    """Calls Gemini via the official google-genai SDK with gemini-flash-latest.
+    Natively supports both new Authorization keys (AQ.*) and legacy standard keys (AIza*).
+    """
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    if not gemini_key:
+        return None
+    try:
+        from google import genai
+        
+        available_roles = [r["name"] for r in roles]
+        prompt = (
+            f"You are a career learning path advisor.\n"
+            f"Given the user's career goal: \"{goal_text}\"\n"
+            f"Choose the single most relevant target role strictly from this list: {available_roles}.\n\n"
+            f"Respond with ONLY a valid JSON object in this exact schema (no markdown, no extra text):\n"
+            f'{{"target_role": "<One role from the list>", "intent_summary": "<Brief 1-sentence summary of learner objective>"}}'
+        )
+
+        client = genai.Client(api_key=gemini_key)
+        response = client.models.generate_content(
+            model='gemini-flash-latest',
+            contents=prompt
+        )
+        
+        raw = response.text.strip()
+        # Strip markdown code fences if present
+        raw = re.sub(r"^```(?:json)?\s*", "", raw)
+        raw = re.sub(r"\s*```$", "", raw)
+        
+        parsed = json.loads(raw)
+        role_name = parsed.get("target_role", "")
+        matched_role = next((r for r in roles if r["name"].lower() == role_name.lower()), None)
+        
+        if matched_role:
+            skill_map = {s["skill_id"]: s["name"] for s in skills}
+            target_skills = [skill_map.get(s_id, s_id) for s_id in matched_role.get("required_skills", [])]
+            return GoalParseResponse(
+                target_role=matched_role["name"],
+                target_role_id=matched_role["role_id"],
+                target_skills=target_skills,
+                parsed_intent=f"Gemini 1.5/2.0 Flash: {parsed.get('intent_summary', 'Extracted target role')}"
+            )
+    except Exception as e:
+        print(f"[GoalParser] Gemini SDK call failed: {e}")
+    return None
+
+
+
+
+async def _try_openai(goal_text: str, roles, skills) -> GoalParseResponse | None:
+    """Calls OpenAI GPT-3.5-turbo for structured JSON role classification."""
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if not openai_key:
+        return None
+    try:
+        available_roles = [r["name"] for r in roles]
+        prompt = (
+            f'You are a career learning path advisor.\n'
+            f'Given the user\'s career goal: "{goal_text}"\n'
+            f'Choose the single most relevant target role strictly from this list: {available_roles}.\n\n'
+            f'Respond with ONLY a valid JSON object:\n'
+            f'{{"target_role": "<One role from the list>", "intent_summary": "<Brief 1-sentence summary>"}}'
+        )
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            res = await client.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={"Authorization": f"Bearer {openai_key}"},
+                json={"model": "gpt-3.5-turbo", "messages": [{"role": "user", "content": prompt}], "temperature": 0.1}
+            )
+        if res.status_code != 200:
+            return None
+        raw = res.json()["choices"][0]["message"]["content"].strip()
+        parsed = json.loads(raw)
+        role_name = parsed.get("target_role", "")
+        matched_role = next((r for r in roles if r["name"].lower() == role_name.lower()), None)
+        if matched_role:
+            skill_map = {s["skill_id"]: s["name"] for s in skills}
+            target_skills = [skill_map.get(s_id, s_id) for s_id in matched_role.get("required_skills", [])]
+            return GoalParseResponse(
+                target_role=matched_role["name"],
+                target_role_id=matched_role["role_id"],
+                target_skills=target_skills,
+                parsed_intent=parsed.get("intent_summary", f"Goal mapped to {matched_role['name']} via OpenAI")
+            )
+    except Exception as e:
+        print(f"[GoalParser] OpenAI call failed: {e}")
+    return None
+
+
 async def parse_goal(goal_text: str) -> GoalParseResponse:
     """
-    Parses a free-text learning goal into structured target_role and target_skills,
-    constrained to the curated taxonomy. Attempts LLM API if key is set,
-    otherwise uses local dense sentence-transformer vector embedding matching.
+    Parses a free-text learning goal into a structured target_role + target_skills,
+    constrained to the curated taxonomy.
+
+    Resolution order:
+      1. Gemini 1.5 Flash (free, fast) — if GEMINI_API_KEY is set
+      2. OpenAI GPT-3.5-turbo         — if OPENAI_API_KEY is set
+      3. Local dense semantic fallback — sentence-transformers cosine similarity (zero cost, always available)
     """
     roles, skills = _get_taxonomy_context()
-    
-    # Try LLM if GEMINI_API_KEY / OPENAI_API_KEY is available
-    openai_key = os.getenv("OPENAI_API_KEY")
 
-    if openai_key:
-        try:
-            available_roles = [r["name"] for r in roles]
-            prompt = f"""You are a career learning path advisor.
-Given the user's career goal: "{goal_text}"
-Choose the single most relevant target role strictly from this list: {available_roles}.
+    result = await _try_gemini(goal_text, roles, skills)
+    if result:
+        return result
 
-Respond with ONLY a valid JSON object in this exact schema:
-{{
-  "target_role": "<One role from the list>",
-  "intent_summary": "<Brief 1-sentence summary of learner objective>"
-}}"""
-            async with httpx.AsyncClient(timeout=5.0) as client:
-                res = await client.post(
-                    "https://api.openai.com/v1/chat/completions",
-                    headers={"Authorization": f"Bearer {openai_key}"},
-                    json={
-                        "model": "gpt-3.5-turbo",
-                        "messages": [{"role": "user", "content": prompt}],
-                        "temperature": 0.1
-                    }
-                )
-                if res.status_code == 200:
-                    content = res.json()["choices"][0]["message"]["content"].strip()
-                    parsed = json.loads(content)
-                    role_name = parsed.get("target_role")
-                    matched_role = next((r for r in roles if r["name"].lower() == role_name.lower()), None)
-                    if matched_role:
-                        skill_map = {s["skill_id"]: s["name"] for s in skills}
-                        target_skills = [skill_map.get(s_id, s_id) for s_id in matched_role.get("required_skills", [])]
-                        return GoalParseResponse(
-                            target_role=matched_role["name"],
-                            target_role_id=matched_role["role_id"],
-                            target_skills=target_skills,
-                            parsed_intent=parsed.get("intent_summary")
-                        )
-        except Exception:
-            pass
+    result = await _try_openai(goal_text, roles, skills)
+    if result:
+        return result
 
-    # Dense Vector Embedding Cosine Similarity
+    # Always-available local fallback: dense semantic vector matching
     return _semantic_embed_parse(goal_text, roles, skills)
+

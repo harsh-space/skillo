@@ -1,4 +1,10 @@
 import os
+from dotenv import load_dotenv
+
+# Load .env from repo root (two levels up from backend/app/)
+_env_path = os.path.join(os.path.dirname(__file__), "..", "..", ".env")
+load_dotenv(dotenv_path=_env_path, override=False)
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
