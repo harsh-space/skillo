@@ -41,14 +41,18 @@ Skillo AI solves all four problems through an end-to-end architecture that combi
 
 - **Natural Language Intent Parsing**: Powered by the official Google GenAI SDK (`google.genai.Client`) using `gemini-flash-latest` / `gemini-2.5-flash`, with a local dense sentence-transformer fallback (`all-MiniLM-L6-v2`) that embeds query and role contexts into 384-dimensional space.
 - **Semantic Skill Gap Vector Analysis**: Pairwise cosine similarity matrix calculations identifying mastered versus missing competencies. Clamps level distinctions (e.g. `Python (basic)` vs `Python (advanced)` similarity is clamped at 0.52) to prevent basic knowledge from falsely satisfying advanced requirements.
-- **Prerequisite DAG Resolution**: NetworkX Directed Acyclic Graph (DAG) transitive closure computation. Automatically injects unstated prerequisite dependencies before topological sorting.
-- **Fact-Grounded Explainable AI (XAI)**: Upstream prerequisite and downstream milestone fact extraction combined with zero-hallucination Gemini mentor rationales.
+- **Prerequisite DAG Resolution**: NetworkX Directed Acyclic Graph (DAG) transitive closure computation. Automatically injects unstated prerequisite dependencies before topological sorting with strictly isolated tracks (no cross-language DAG contamination).
+- **Fact-Grounded Explainable AI (XAI)**: Upstream prerequisite and downstream milestone fact extraction combined with zero-hallucination Gemini mentor rationales, displayed in a compact inline side panel.
 - **Adaptive Feedback Loop**: Real-time roadmap mutation engine:
   - **Score <50%**: Injects a targeted remedial refresher node immediately at index + 1.
   - **Score >=90%**: Flags downstream dependent steps as skippable/accelerated.
   - **Completion / Score 50--89%**: Advances active step pointer and persists progress.
-- **Dual-Tier Database Persistence**: Live Firebase Firestore integration with transparent zero-config fallback to wear-leveled local JSON storage (`app/data/db_storage.json`). Lazy credential loading avoids gRPC initialization hangs during local development.
-- **Modern Synchronized Motion UX**: 2-step onboarding wizard in a fixed-height card (`h-[340px]`), synchronized dual-panel viewport carousel (`w-[200%]`) with cubic-bezier transition, and an orbiting background tech constellation (`OrbitBackground.tsx`).
+- **Live Cloud Firebase Firestore & Dual-Tier Persistence**: Native Google Cloud Firestore integration with automatic credentials resolution (`backend/firebase-key.json` or `.env`) and transparent zero-config fallback to wear-leveled local JSON storage (`app/data/db_storage.json`).
+- **Modern Interactive Dashboard & Glassmorphic UI**:
+  - **Horizontal Action & Stats Ribbon**: Clean glassmorphic toolbar with live `% Done` progress, click-to-expand flyouts for *Mastered Competencies*, *Skill Gap Breakdown*, and *DAG Trajectory*, plus *Refresh Path* and *New Goal* shortcuts.
+  - **Docked Inline XAI Card**: Contextual side card fitting into the empty right column beside the roadmap timeline, replacing disruptive modal popups.
+  - **Collapsed-by-Default Milestones**: Clean accordion timeline blocks that expand on demand with resources and adaptive quizzes.
+  - **Zero Layout Shift**: Centered project banner and `scrollbar-gutter: stable` for seamless transitions between onboarding and dashboard views.
 
 ---
 
@@ -86,65 +90,64 @@ Skillo AI is built on a modular five-layer architecture designed for high perfor
 
 ---
 
-## Database Architecture & Data Model
-
-Skillo AI uses a structured document schema stored natively in Firebase Firestore or mirrored in `backend/app/data/db_storage.json`:
-
-- `skills`: Skill metadata (`skill_id`, `name`, `category`, `description`, `embedding_vector`).
-- `roles`: Career role taxonomy (`role_id`, `name`, `description`, `required_skills`).
-- `prerequisites`: Directed dependency edges (`prereq_id`, `from_skill_id`, `to_skill_id`).
-- `resources`: Curated learning content (`resource_id`, `skill_id`, `title`, `url`, `type`, `is_remedial`).
-- `learners`: Learner profile documents (`learner_id`, `name`, `current_skills`, `target_role_id`).
-- `roadmaps`: Generated learning paths (`learner_id`, `roadmap` steps array, `created_at`, `updated_at`).
-- `feedback_events`: Audit log of adaptive assessment events (`event_id`, `learner_id`, `step`, `score`, `action_taken`).
-
----
-
-## Step-by-Step Setup & Execution Instructions
-
-### Prerequisites
-- **Python 3.10+** (Python 3.11 recommended)
-- **Node.js 18+** and **npm**
-
----
-
-### Option A: Standard Local Setup (Recommended)
-
-#### 1. Clone & Navigate
-```bash
-git clone https://github.com/harsh-space/skillo.git
-cd skillo
-```
-
-#### 2. Backend Setup & Local Database Seeding
-```bash
-# 1. Create and activate a virtual environment
-python -m venv venv
-# On Windows:
-venv\Scripts\activate
-# On Linux/macOS:
-source venv/bin/activate
-
-# 2. Install backend dependencies
-pip install -r backend/requirements.txt
-
-# 3. Seed the initial dataset (34 skills, 5 roles, 35 DAG edges, 43 resources)
-python scripts/seed_db.py
-
-# 4. Run backend automated test suite
-pytest backend/tests/test_backend.py -v
-
-# 5. Start FastAPI backend server
-python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
-```
-The FastAPI server will run at `http://127.0.0.1:8000`. Interactive OpenAPI documentation is accessible at `http://127.0.0.1:8000/docs`.
-
-> **Environment Variables (Optional)**: Create a `.env` file in the root directory to enable Google Gemini AI or Firebase Firestore:
-> ```env
-> GEMINI_API_KEY=your_gemini_api_key_here
-> GOOGLE_APPLICATION_CREDENTIALS=path/to/firebase_service_account.json
-> ```
-> *Note: If no API key is provided, Skillo AI transparently falls back to local dense vector embeddings and graph template rationales without throwing errors.*
+### Database Architecture & Data Model
+ 
+ Skillo AI uses a structured document schema stored natively in **Google Cloud Firestore** (or mirrored in `backend/app/data/db_storage.json` during offline local fallback):
+ 
+ - `skills`: 36 Skill metadata documents (`skill_id`, `name`, `category`, `description`).
+ - `roles`: 6 Career role taxonomy documents (`role_id`, `name`, `description`, `required_skills`).
+ - `prerequisites`: 29 Directed DAG dependency edges (`from_skill_id`, `to_skill_id`).
+ - `resources`: 49 Curated learning materials & courses (`resource_id`, `skill_id`, `title`, `url`, `type`, `is_remedial`).
+ - `learners`: Dynamic learner profile documents (`learner_id`, `name`, `current_skills`, `target_role_id`, `created_at`, `updated_at`).
+ - `roadmaps`: Generated learning paths (`learner_id`, `target_role`, `target_role_id`, `steps` array, `gap_summary`, `updated_at`).
+ - `feedback_events`: Audit log of adaptive assessment quiz events (`learner_id`, `step_id`, `event_type`, `value`, `timestamp`).
+ 
+ ---
+ 
+ ## Step-by-Step Setup & Execution Instructions
+ 
+ ### Prerequisites
+ - **Python 3.10+** (Python 3.11+ recommended)
+ - **Node.js 18+** and **npm**
+ 
+ ---
+ 
+ ### Option A: Standard Local & Cloud Setup
+ 
+ #### 1. Clone & Navigate
+ ```bash
+ git clone https://github.com/harsh-space/skillo.git
+ cd skillo
+ ```
+ 
+ #### 2. Backend Setup & Live Firebase Seeding
+ ```bash
+ # 1. Create and activate a virtual environment
+ python -m venv venv
+ # On Windows:
+ venv\Scripts\activate
+ # On Linux/macOS:
+ source venv/bin/activate
+ 
+ # 2. Install backend dependencies
+ pip install -r backend/requirements.txt
+ 
+ # 3. (Optional) Configure Firebase Firestore & Gemini AI in .env:
+ # Place your Firebase service account key in backend/firebase-key.json (auto-discovered)
+ # Or set in .env:
+ # GOOGLE_APPLICATION_CREDENTIALS=backend/firebase-key.json
+ # GEMINI_API_KEY=your_gemini_api_key_here
+ 
+ # 4. Seed database (seeds live Firestore if credentials present, or local JSON):
+ python scripts/seed_db.py
+ 
+ # 5. Run backend automated test suite
+ pytest backend/tests/test_backend.py -v
+ 
+ # 6. Start FastAPI backend server
+ python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
+ ```
+ The FastAPI server will run at `http://127.0.0.1:8000`. Interactive OpenAPI documentation is accessible at `http://127.0.0.1:8000/docs`.
 
 #### 3. Frontend Setup
 In a separate terminal:
