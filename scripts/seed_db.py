@@ -13,6 +13,14 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 def seed_database():
     print("[Seed] Seeding database collections from JSON files...")
 
+    # Clear existing collections to ensure deleted edges and stale roadmaps are removed
+    db.local_data["skills"] = {}
+    db.local_data["roles"] = {}
+    db.local_data["prerequisites"] = {}
+    db.local_data["resources"] = {}
+    db.local_data["roadmaps"] = {}
+    db._save_local_db()
+
     # 1. Skills
     skills_file = os.path.join(DATA_DIR, "seed_skills.json")
     with open(skills_file, "r", encoding="utf-8") as f:

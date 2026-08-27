@@ -3,9 +3,16 @@ import os
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
-# Path for local persistence
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+# Path for local persistence & project root
+APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(APP_DIR, "data")
+BACKEND_DIR = os.path.dirname(APP_DIR)
+PROJECT_ROOT = os.path.dirname(BACKEND_DIR)
 LOCAL_DB_FILE = os.path.join(DATA_DIR, "db_storage.json")
+
+# Ensure .env is loaded
+from dotenv import load_dotenv
+load_dotenv(os.path.join(PROJECT_ROOT, ".env"), override=False)
 
 
 class DatabaseClient:
@@ -37,8 +44,34 @@ class DatabaseClient:
             from firebase_admin import credentials, firestore
 
             cred = None
-            if cred_path and os.path.exists(cred_path):
-                cred = credentials.Certificate(cred_path)
+            resolved_path = None
+
+            # Check potential credential file paths
+            candidate_paths = []
+            if cred_path:
+                candidate_paths.extend([
+                    cred_path,
+                    os.path.join(PROJECT_ROOT, cred_path),
+                    os.path.join(BACKEND_DIR, cred_path),
+                    os.path.join(BACKEND_DIR, os.path.basename(cred_path))
+                ])
+            
+            # Also check common default filenames
+            for default_name in ["firebase-key.json", "firbase-key.json", "serviceAccountKey.json"]:
+                candidate_paths.extend([
+                    os.path.join(BACKEND_DIR, default_name),
+                    os.path.join(PROJECT_ROOT, default_name),
+                    default_name
+                ])
+
+            for p in candidate_paths:
+                if p and os.path.exists(p) and os.path.isfile(p):
+                    resolved_path = os.path.abspath(p)
+                    break
+
+            if resolved_path:
+                cred = credentials.Certificate(resolved_path)
+                print(f"[DB] Initializing Firebase with key from: {resolved_path}")
             elif cred_json_str:
                 cred_dict = json.loads(cred_json_str)
                 cred = credentials.Certificate(cred_dict)
@@ -47,18 +80,53 @@ class DatabaseClient:
                 if not firebase_admin._apps:
                     firebase_admin.initialize_app(cred)
                 self.firestore_db = firestore.client()
-                print("[DB] Connected to live Firebase Firestore.")
+                print("[DB] SUCCESS: Connected to live Firebase Firestore database!")
             else:
                 self.firestore_db = None
+                print("[DB] No valid Firebase credentials found. Running in local fallback mode.")
         except Exception as e:
             print(f"[DB Warning] Could not initialize Firestore: {e}. Using local JSON storage.")
             self.firestore_db = None
 
     def _load_local_db(self):
+        # 1. Always load curated seed collections directly from their source files
+        try:
+            skills_file = os.path.join(DATA_DIR, "seed_skills.json")
+            if os.path.exists(skills_file):
+                with open(skills_file, "r", encoding="utf-8") as f:
+                    skills = json.load(f)
+                    self.local_data["skills"] = {s["skill_id"]: s for s in skills}
+
+            roles_file = os.path.join(DATA_DIR, "seed_roles.json")
+            if os.path.exists(roles_file):
+                with open(roles_file, "r", encoding="utf-8") as f:
+                    roles = json.load(f)
+                    self.local_data["roles"] = {r["role_id"]: r for r in roles}
+
+            prereqs_file = os.path.join(DATA_DIR, "seed_prerequisites.json")
+            if os.path.exists(prereqs_file):
+                with open(prereqs_file, "r", encoding="utf-8") as f:
+                    prereqs = json.load(f)
+                    self.local_data["prerequisites"] = {
+                        f"edge_{p['from_skill_id']}_{p['to_skill_id']}": p for p in prereqs
+                    }
+
+            res_file = os.path.join(DATA_DIR, "seed_resources.json")
+            if os.path.exists(res_file):
+                with open(res_file, "r", encoding="utf-8") as f:
+                    resources = json.load(f)
+                    self.local_data["resources"] = {r["resource_id"]: r for r in resources}
+        except Exception as e:
+            print(f"[DB Warning] Could not load seed files: {e}")
+
+        # 2. Load dynamic learner/roadmap records from db_storage.json if exists
         if os.path.exists(LOCAL_DB_FILE):
             try:
                 with open(LOCAL_DB_FILE, "r", encoding="utf-8") as f:
-                    self.local_data = json.load(f)
+                    stored = json.load(f)
+                    for dynamic_col in ["learners", "roadmaps", "feedback_events"]:
+                        if dynamic_col in stored:
+                            self.local_data[dynamic_col] = stored[dynamic_col]
             except Exception:
                 pass
 
@@ -86,6 +154,7 @@ class DatabaseClient:
                     return doc.to_dict()
             except Exception:
                 pass
+        self._load_local_db()
         return self.local_data.get(collection, {}).get(doc_id)
 
     def list_documents(self, collection: str) -> List[Dict[str, Any]]:
@@ -95,6 +164,7 @@ class DatabaseClient:
                 return [d.to_dict() for d in docs]
             except Exception:
                 pass
+        self._load_local_db()
         return list(self.local_data.get(collection, {}).values())
 
     def update_document(self, collection: str, doc_id: str, updates: Dict[str, Any]):

@@ -77,10 +77,14 @@ def generate_recommendation(req: RecommendRequest):
 
 
 @router.get("/roadmap/{learner_id}", response_model=RoadmapResponse)
-def get_learner_roadmap(learner_id: str):
+def get_learner_roadmap(learner_id: str, regenerate: bool = False):
+    if regenerate:
+        return generate_recommendation(RecommendRequest(learner_id=learner_id))
+
     doc = db.get_document("roadmaps", learner_id)
     if not doc:
         # Generate automatically if not exists
         return generate_recommendation(RecommendRequest(learner_id=learner_id))
 
     return RoadmapResponse(**doc)
+

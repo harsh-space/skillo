@@ -28,12 +28,11 @@ export default function RoadmapTimeline({
   onExplainClick,
   onQuizClick,
 }: RoadmapTimelineProps) {
-  // State for collapsible steps (key: step_id or step index)
-  // By default, step 1 / in-progress is expanded, but user can click header to toggle any step
-  const [collapsedSteps, setCollapsedSteps] = useState<Record<string, boolean>>({});
+  // State for expandable steps — all collapsed by default, user clicks to open
+  const [expandedSteps, setExpandedSteps] = useState<Record<string, boolean>>({});
 
   const toggleCollapse = (stepKey: string) => {
-    setCollapsedSteps((prev) => ({
+    setExpandedSteps((prev) => ({
       ...prev,
       [stepKey]: !prev[stepKey],
     }));
@@ -67,7 +66,7 @@ export default function RoadmapTimeline({
           const isInProgress = step.status === 'in_progress';
           const isRemedial = step.is_remedial;
           const stepKey = step.step_id || `step_${step.step}_${idx}`;
-          const isCollapsed = !!collapsedSteps[stepKey];
+          const isCollapsed = !expandedSteps[stepKey];
 
           return (
             <div key={stepKey} className="relative group flex items-start gap-3">

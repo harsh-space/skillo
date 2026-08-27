@@ -94,6 +94,17 @@ export async function fetchRoadmap(learner_id: string): Promise<RoadmapData> {
   return res.json();
 }
 
+/** Always triggers a fresh roadmap generation (force recalculate from skills) */
+export async function generateRoadmap(learner_id: string): Promise<RoadmapData> {
+  const res = await fetch(`${API_BASE}/recommend`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ learner_id, force_regenerate: true }),
+  });
+  if (!res.ok) throw new Error("Failed to generate roadmap");
+  return res.json();
+}
+
 export async function sendFeedback(learner_id: string, step_id: string, event: string, value?: number) {
   const res = await fetch(`${API_BASE}/feedback`, {
     method: "POST",
