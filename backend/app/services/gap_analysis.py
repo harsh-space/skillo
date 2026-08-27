@@ -1,16 +1,16 @@
+from typing import List, Dict, Any, Optional
 import numpy as np
-from typing import List, Dict, Any, Tuple
 from app.services.db import db
 from app.models.schemas import GapSummary, GapSkillDetail
 
 SIMILARITY_THRESHOLD = 0.60
 
 # Model cache
-_embedding_model = None
+_embedding_model: Any = None
 _skill_embeddings_cache: Dict[str, np.ndarray] = {}
 
 
-def get_embedding_model():
+def get_embedding_model() -> Any:
     global _embedding_model
     if _embedding_model is None:
         try:
@@ -23,12 +23,16 @@ def get_embedding_model():
     return _embedding_model
 
 
-def _compute_cosine_similarity(vec_a: np.ndarray, vec_b: np.ndarray) -> float:
-    norm_a = np.linalg.norm(vec_a)
-    norm_b = np.linalg.norm(vec_b)
-    if norm_a == 0 or norm_b == 0:
+def _compute_cosine_similarity(vec_a: Any, vec_b: Any) -> float:
+    if vec_a is None or vec_b is None:
         return 0.0
-    return float(np.dot(vec_a, vec_b) / (norm_a * norm_b))
+    arr_a = np.asarray(vec_a, dtype=np.float32)
+    arr_b = np.asarray(vec_b, dtype=np.float32)
+    norm_a = float(np.linalg.norm(arr_a))
+    norm_b = float(np.linalg.norm(arr_b))
+    if norm_a == 0.0 or norm_b == 0.0:
+        return 0.0
+    return float(np.dot(arr_a, arr_b) / (norm_a * norm_b))
 
 
 def _fallback_similarity(text_a: str, text_b: str) -> float:
@@ -47,15 +51,16 @@ def _fallback_similarity(text_a: str, text_b: str) -> float:
     return len(intersection) / len(words_a.union(words_b))
 
 
-def get_skill_embedding(skill_name: str, skill_desc: str = "") -> Any:
+def get_skill_embedding(skill_name: str, skill_desc: str = "") -> Optional[np.ndarray]:
     text = f"{skill_name}: {skill_desc}" if skill_desc else skill_name
     if text in _skill_embeddings_cache:
         return _skill_embeddings_cache[text]
     model = get_embedding_model()
-    if model != "fallback":
+    if model != "fallback" and hasattr(model, "encode"):
         vec = model.encode(text)
-        _skill_embeddings_cache[text] = vec
-        return vec
+        arr = np.asarray(vec, dtype=np.float32)
+        _skill_embeddings_cache[text] = arr
+        return arr
     return None
 
 
@@ -72,56 +77,58 @@ def run_gap_analysis(
     if not role:
         # Try finding role by name or fallback to first role
         roles = db.list_documents("roles")
-        role = next((r for r in roles if r["name"].lower() == target_role_id.lower()), roles[0] if roles else None)
+        role = next((r for r in roles if str(r.get("name", "")).lower() == target_role_id.lower()), roles[0] if roles else None)
     
     if not role:
         return GapSummary(missing_skills=[], matched_skills=[], details=[])
 
     all_skills = db.list_documents("skills")
-    skill_by_id = {s["skill_id"]: s for s in all_skills}
-    skill_by_name = {s["name"].lower(): s for s in all_skills}
+    skill_by_id = {str(s.get("skill_id")): s for s in all_skills}
+    skill_by_name = {str(s.get("name", "")).lower(): s for s in all_skills}
 
     required_skill_ids = role.get("required_skills", [])
     model = get_embedding_model()
+    has_encoder = model != "fallback" and hasattr(model, "encode")
 
     # Pre-encode learner current skills
     current_embeddings = []
-    if model != "fallback" and current_skills:
+    if has_encoder and current_skills:
         for cs in current_skills:
             # Find description if known
             s_obj = skill_by_name.get(cs.lower())
             desc = s_obj.get("description", "") if s_obj else ""
             emb = get_skill_embedding(cs, desc)
-            current_embeddings.append((cs, emb))
+            if emb is not None:
+                current_embeddings.append((cs, emb))
 
-    matched_skills = []
-    missing_skills = []
-    details = []
+    matched_skills: List[str] = []
+    missing_skills: List[str] = []
+    details: List[GapSkillDetail] = []
 
     for req_id in required_skill_ids:
-        req_obj = skill_by_id.get(req_id, {"name": req_id, "description": ""})
-        req_name = req_obj.get("name", req_id)
-        req_desc = req_obj.get("description", "")
+        req_obj = skill_by_id.get(str(req_id), {"name": str(req_id), "description": ""})
+        req_name = str(req_obj.get("name", str(req_id)))
+        req_desc = str(req_obj.get("description", ""))
 
         best_sim = 0.0
-        best_match_skill = None
+        best_match_skill: Optional[str] = None
 
         if not current_skills:
             best_sim = 0.0
-        elif model != "fallback" and current_embeddings:
+        elif has_encoder and current_embeddings:
             req_emb = get_skill_embedding(req_name, req_desc)
-            for cs_name, cs_emb in current_embeddings:
-                sim = _compute_cosine_similarity(req_emb, cs_emb)
-                # Specific domain normalization
-                if "python (basic)" in cs_name.lower() and "python (advanced)" in req_name.lower():
-                    # Python basic overlaps with Python advanced partially (~0.52) but is distinct gap
-                    sim = 0.52
-                elif cs_name.lower() == req_name.lower():
-                    sim = 1.0
+            if req_emb is not None:
+                for cs_name, cs_emb in current_embeddings:
+                    sim = _compute_cosine_similarity(req_emb, cs_emb)
+                    # Specific domain normalization
+                    if "python (basic)" in cs_name.lower() and "python (advanced)" in req_name.lower():
+                        sim = 0.52
+                    elif cs_name.lower() == req_name.lower():
+                        sim = 1.0
 
-                if sim > best_sim:
-                    best_sim = sim
-                    best_match_skill = cs_name
+                    if sim > best_sim:
+                        best_sim = sim
+                        best_match_skill = cs_name
         else:
             for cs_name in current_skills:
                 sim = _fallback_similarity(req_name, cs_name)
@@ -140,7 +147,7 @@ def run_gap_analysis(
             missing_skills.append(req_name)
 
         details.append(GapSkillDetail(
-            skill_id=req_id,
+            skill_id=str(req_id),
             name=req_name,
             similarity_score=round(float(best_sim), 3),
             status=status,
