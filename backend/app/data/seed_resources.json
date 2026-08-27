@@ -342,5 +342,53 @@
     "url": "https://prometheus.io/docs/introduction/overview/",
     "type": "course",
     "is_remedial": false
+  },
+  {
+    "resource_id": "res_llm_rag_course",
+    "skill_id": "skill_llm_rag",
+    "title": "Building LLM Applications, Prompt Engineering & RAG Pipelines",
+    "url": "https://python.langchain.com/docs/get_started/introduction",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_llm_rag_remedial",
+    "skill_id": "skill_llm_rag",
+    "title": "LLM Prompting & RAG Core Concepts Refresher",
+    "url": "https://docs.llamaindex.ai/en/stable/",
+    "type": "course",
+    "is_remedial": true
+  },
+  {
+    "resource_id": "res_llm_rag_proj",
+    "skill_id": "skill_llm_rag",
+    "title": "Project: Build a Production RAG Assistant with LangChain & OpenAI",
+    "url": "https://python.langchain.com/docs/use_cases/question_answering/",
+    "type": "project",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_vector_dbs_course",
+    "skill_id": "skill_vector_dbs",
+    "title": "Vector Databases, Embeddings & Semantic Search Masterclass",
+    "url": "https://docs.trychroma.com/",
+    "type": "course",
+    "is_remedial": false
+  },
+  {
+    "resource_id": "res_vector_dbs_remedial",
+    "skill_id": "skill_vector_dbs",
+    "title": "Vector Embeddings & Indexing Fundamentals Refresher",
+    "url": "https://www.pinecone.io/learn/vector-database/",
+    "type": "course",
+    "is_remedial": true
+  },
+  {
+    "resource_id": "res_vector_dbs_proj",
+    "skill_id": "skill_vector_dbs",
+    "title": "Project: Build a High-Performance Vector Similarity Search Service",
+    "url": "https://faiss.ai/",
+    "type": "project",
+    "is_remedial": false
   }
 ]

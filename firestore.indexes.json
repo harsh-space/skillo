@@ -1,0 +1,29 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "prerequisites",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "from_skill_id", "order": "ASCENDING" },
+        { "fieldPath": "to_skill_id", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "resources",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "skill_id", "order": "ASCENDING" },
+        { "fieldPath": "is_remedial", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "feedback_events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "learner_id", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

@@ -83,5 +83,20 @@
       "skill_docker",
       "skill_fastapi"
     ]
+  },
+  {
+    "role_id": "role_ai_engineer",
+    "name": "AI Engineer",
+    "description": "Engineers intelligent AI solutions, generative AI applications, LLM agents, RAG systems, deep learning models, and scalable AI microservices.",
+    "required_skills": [
+      "skill_python_basics",
+      "skill_python_advanced",
+      "skill_ml_basics",
+      "skill_deep_learning",
+      "skill_llm_rag",
+      "skill_vector_dbs",
+      "skill_fastapi",
+      "skill_docker"
+    ]
   }
 ]

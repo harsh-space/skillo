@@ -73,7 +73,7 @@ export default function Dashboard({ learnerData, onReset }: DashboardProps) {
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-indigo-400">Learner Profile:</span>
               <span className="text-xs font-bold text-white px-2 py-0.5 rounded bg-slate-800">
-                {learnerData.name} ({learnerData.learner_id})
+                {learnerData.name}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-1 flex items-center gap-2">

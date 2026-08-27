@@ -51,6 +51,18 @@ def test_goal_parsing_worked_example():
     assert any("rest" in s.lower() or "api" in s.lower() for s in parsed.target_skills)
 
 
+def test_ai_engineer_goal_parsing():
+    roles = db.list_documents("roles")
+    skills = db.list_documents("skills")
+    goal_text = "I want to become an AI engineer"
+    
+    parsed = _semantic_embed_parse(goal_text, roles, skills)
+    assert parsed.target_role == "AI Engineer"
+    assert parsed.target_role_id == "role_ai_engineer"
+    assert "LLM Applications & RAG Systems" in parsed.target_skills
+    assert "Vector Databases & Embeddings" in parsed.target_skills
+
+
 def test_gap_analysis_worked_example():
     # Input: learner knows HTML, CSS, basic Python
     current_skills = ["HTML", "CSS", "Python (basic)"]

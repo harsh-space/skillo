@@ -1,0 +1,46 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Static Taxonomy & Seed Collections (Publicly readable, admin writable)
+    match /skills/{skillId} {
+      allow read: if true;
+      allow write: if false; // Only manageable via service account / admin seed
+    }
+
+    match /roles/{roleId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /prerequisites/{edgeId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /resources/{resourceId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // 2. Dynamic Learner Profiles (Read and Write by session or authenticated user)
+    match /learners/{learnerId} {
+      allow read, create, update: if true; // Public demo session or authenticated user
+      allow delete: if request.auth != null && request.auth.uid == learnerId;
+    }
+
+    // 3. Dynamic Roadmaps & Milestone Trajectories
+    match /roadmaps/{learnerId} {
+      allow read, create, update: if true;
+      allow delete: if request.auth != null && request.auth.uid == learnerId;
+    }
+
+    // 4. Adaptive Feedback Events & Quiz Signals (Append-only tracking)
+    match /feedback_events/{eventId} {
+      allow read, create: if true;
+      allow update, delete: if false; // Append-only audit trail
+    }
+
+  }
+}
