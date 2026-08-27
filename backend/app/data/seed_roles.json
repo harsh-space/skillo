@@ -2,20 +2,16 @@
   {
     "role_id": "role_backend_developer",
     "name": "Backend Developer",
-    "description": "Designs, builds, and maintains server-side architecture, REST/GraphQL APIs, databases, authentication, and cloud deployments.",
+    "description": "Designs, builds, and maintains server-side architecture, REST/FastAPI services, databases, authentication, and containerized deployments.",
     "required_skills": [
       "skill_python_advanced",
       "skill_sql",
-      "skill_rest_apis",
-      "skill_git",
-      "skill_auth",
-      "skill_docker",
       "skill_orm",
+      "skill_rest_apis",
       "skill_fastapi",
-      "skill_redis",
-      "skill_unit_testing",
-      "skill_web_security",
-      "skill_system_design"
+      "skill_auth",
+      "skill_git",
+      "skill_docker"
     ]
   },
   {
@@ -30,9 +26,7 @@
       "skill_react",
       "skill_nextjs",
       "skill_rest_apis",
-      "skill_git",
-      "skill_unit_testing",
-      "skill_web_security"
+      "skill_git"
     ]
   },
   {
@@ -49,8 +43,7 @@
       "skill_rest_apis",
       "skill_auth",
       "skill_git",
-      "skill_docker",
-      "skill_cloud"
+      "skill_docker"
     ]
   },
   {
@@ -62,10 +55,9 @@
       "skill_git",
       "skill_docker",
       "skill_cicd",
-      "skill_cloud",
       "skill_kubernetes",
-      "skill_monitoring",
-      "skill_web_security"
+      "skill_cloud",
+      "skill_monitoring"
     ]
   },
   {
@@ -80,8 +72,22 @@
       "skill_deep_learning",
       "skill_sql",
       "skill_git",
-      "skill_docker",
-      "skill_fastapi"
+      "skill_docker"
+    ]
+  },
+  {
+    "role_id": "role_ai_engineer",
+    "name": "AI Engineer",
+    "description": "Engineers intelligent AI solutions, generative AI applications, LLM agents, RAG systems, deep learning models, and scalable AI microservices.",
+    "required_skills": [
+      "skill_python_basics",
+      "skill_python_advanced",
+      "skill_ml_basics",
+      "skill_deep_learning",
+      "skill_llm_rag",
+      "skill_vector_dbs",
+      "skill_fastapi",
+      "skill_docker"
     ]
   }
 ]

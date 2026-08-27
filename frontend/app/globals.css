@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
+
   body {
     @apply bg-background text-slate-100 min-h-screen antialiased selection:bg-primary-500 selection:text-white;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";

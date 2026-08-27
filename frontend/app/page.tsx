@@ -39,7 +39,7 @@ export default function Home() {
 
       {/* Top Brand Header Banner */}
       <header className="border-b border-slate-800/80 bg-slate-950/50 backdrop-blur-md sticky top-0 z-40 py-3 sm:py-4 shadow-lg shadow-black/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col items-center justify-center text-center gap-0.5">
+        <div className="w-full flex flex-col items-center justify-center text-center gap-0.5">
           <span className="font-black text-2xl sm:text-3xl bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent tracking-tight cursor-default select-none">
             Skillo AI
           </span>

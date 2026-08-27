@@ -11,8 +11,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -38,9 +38,17 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.tsbuildinfo
 
 # Database & local storage (never push local DB state)
 backend/app/data/db_storage.json
+
+# Secrets & Keys
+*firebase-key.json
+*firbase-key.json
+*serviceAccountKey.json
+*.pem
+*.key
 
 # Misc
 .DS_Store
