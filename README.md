@@ -4,6 +4,11 @@
 
 > Most learning websites just show you a list of courses. Skillo AI figures out *which skills you already have*, *which ones you're missing*, and builds a step-by-step plan in the right order — and adjusts it based on how well you're doing.
 
+> [!IMPORTANT]
+> You can test the application directly using the following deployed environments:
+> - **Live Web App**: [skillo-frontend-amber.vercel.app](https://skillo-frontend-amber.vercel.app/)
+> - **Backend API & Swagger Docs**: [skillo-backend-ooyl.onrender.com/docs](https://skillo-backend-ooyl.onrender.com/docs)
+
 ---
 
 ## What Is Skillo AI?
