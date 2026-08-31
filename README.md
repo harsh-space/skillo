@@ -34,6 +34,7 @@ When you search for "how to become a backend developer" online, you get a flood 
 
 ## Features
 
+- **User accounts & session saving** — Secure sign up and login so your custom roadmaps, quizzes, and completed tasks are saved to your personal profile.
 - **Plain-language goal input** — Just type what you want to become. No dropdowns or complicated forms needed.
 - **Skill gap detection** — Shows exactly which skills you're missing versus which ones you already have.
 - **Ordered learning plan** — Steps are arranged so each one builds naturally on the previous one.
@@ -41,7 +42,8 @@ When you search for "how to become a backend developer" online, you get a flood 
 - **Quizzes with real-time plan adjustment** — Your roadmap actually changes based on your quiz results.
 - **Progress tracking** — Your completed steps, percentage progress, and quiz history are all saved.
 - **Career history sidebar** — Like a chat history in ChatGPT, you can switch between different career paths you've explored before, and your full roadmap is restored instantly.
-- **Works offline too** — If no internet database is connected, everything saves locally on your machine.
+- **Ultra-lightweight & cloud ready** — Uses under 60MB of RAM, making it fast and completely free to host on platforms like Render and Vercel.
+- **Works offline too** — If no internet database is connected, everything automatically saves locally on your machine.
 
 ---
 
@@ -161,6 +163,30 @@ If you have Docker installed, you can run the whole app with:
 docker build -t skillo-ai .
 docker run -p 8000:8000 skillo-ai
 ```
+
+---
+
+## Free Cloud Deployment
+
+You can host the entire app completely free using **Render** (for the backend) and **Vercel** (for the frontend):
+
+### 1. Deploy the Backend on Render
+1. Go to **[render.com](https://render.com)** and create a new **Web Service**.
+2. Connect this GitHub repository.
+3. Select **Docker** as the runtime.
+4. Add your environment variables:
+   - `GEMINI_API_KEY`: Your Google Gemini API Key.
+   - `FIREBASE_KEY_JSON`: *(Optional)* Copy-paste the contents of your `firebase-key.json` if using cloud Firestore.
+5. Click **Deploy**. You'll get a URL like `https://your-backend.onrender.com`.
+
+> **Tip**: Render's free tier goes to sleep after 15 minutes of inactivity. To keep it awake 24/7 with zero cold starts, create a free monitor at **[uptimerobot.com](https://uptimerobot.com)** that pings `https://your-backend.onrender.com/health` every 10 minutes.
+
+### 2. Deploy the Frontend on Vercel
+1. Go to **[vercel.com](https://vercel.com)** and import this GitHub repository.
+2. Set the **Root Directory** to `frontend`.
+3. Add one environment variable:
+   - `NEXT_PUBLIC_API_URL`: Your Render backend URL (e.g. `https://your-backend.onrender.com/api/v1`).
+4. Click **Deploy** — your live website is ready!
 
 ---
 
