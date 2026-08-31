@@ -93,17 +93,16 @@ The app is split into two main parts:
 All your progress, skills, and roadmaps are stored in a database. By default it connects to **Google Firestore** (Google's cloud database). If that's not available, it automatically falls back to a local file on your computer — no setup needed.
 
 ### How everything connects
-
-<p align="center">
-  <img src="docs/career_ai_architecture_layers.png" width="650" alt="Skillo AI Backend Flow Architecture"/>
+<!-- <p align="center">
+  <img src="docs\career_ai_backend_flow_architecturea.png" width="650" alt="Skillo AI Backend Flow Architecture"/>
   <br/>
   <em>Figure 1: How data flows from your goal input through to the final roadmap</em>
-</p>
+</p> -->
 
 <p align="center">
-  <img src="docs/career_ai_backend_flow_architecture.png" width="650" alt="Skillo AI Architectural Layers"/>
+  <img src="docs\career_ai_architecture_layersa.png" width="650" alt="Skillo AI Architectural Layers"/>
   <br/>
-  <em>Figure 2: The different layers of the system and how they work together</em>
+  <em>Figure 1: The different layers of the system and how they work together</em>
 </p>
 
 ---
