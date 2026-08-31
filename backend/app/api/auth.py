@@ -37,10 +37,25 @@ def signup(req: UserSignupRequest):
         raise HTTPException(status_code=400, detail="Password must be at least 4 characters long.")
 
     # Check if user already exists
-    existing_users = db.list_documents("users")
-    for u in existing_users:
-        if u.get("email", "").lower() == email:
-            raise HTTPException(status_code=409, detail="An account with this email already exists.")
+    existing_users = db.query_documents("users", "email", email)
+    if existing_users:
+        target_user = existing_users[0]
+        stored_hash = target_user.get("password_hash", "")
+        salt = target_user.get("salt", "")
+        if _verify_password(req.password, stored_hash, salt):
+            # Password matches: auto-login existing user seamlessly
+            token = target_user.get("token") or secrets.token_hex(24)
+            target_user["token"] = token
+            target_user["updated_at"] = datetime.now(timezone.utc).isoformat()
+            db.set_document("users", target_user["user_id"], target_user)
+            return UserResponse(
+                user_id=target_user["user_id"],
+                name=target_user.get("name", name),
+                email=target_user.get("email", email),
+                learner_id=target_user.get("learner_id", f"learner_{target_user['user_id']}"),
+                token=token
+            )
+        raise HTTPException(status_code=409, detail="An account with this email already exists. Please sign in instead.")
 
     user_id = f"user_{secrets.token_hex(8)}"
     clean_name = name.lower().replace(" ", "_")
@@ -93,21 +108,21 @@ def login(req: UserLoginRequest):
     if not email:
         raise HTTPException(status_code=400, detail="Email is required.")
 
-    existing_users = db.list_documents("users")
-    target_user = None
-    for u in existing_users:
-        if u.get("email", "").lower() == email:
-            target_user = u
-            break
+    existing_users = db.query_documents("users", "email", email)
+    if not existing_users:
+        # Check all users as fallback
+        all_u = db.list_documents("users")
+        existing_users = [u for u in all_u if str(u.get("email", "")).strip().lower() == email]
 
-    if not target_user:
-        raise HTTPException(status_code=401, detail="Invalid email or password.")
+    if not existing_users:
+        raise HTTPException(status_code=401, detail="No account found with this email. Please click 'Create Account' to sign up.")
 
+    target_user = existing_users[0]
     stored_hash = target_user.get("password_hash", "")
     salt = target_user.get("salt", "")
 
     if not _verify_password(req.password, stored_hash, salt):
-        raise HTTPException(status_code=401, detail="Invalid email or password.")
+        raise HTTPException(status_code=401, detail="Incorrect password. Please try again.")
 
     # Generate or reuse token
     token = target_user.get("token") or secrets.token_hex(24)
