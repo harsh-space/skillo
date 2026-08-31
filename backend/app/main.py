@@ -61,7 +61,8 @@ for prefix in [API_PREFIX, ""]:
     app.include_router(taxonomy.router, prefix=prefix)
 
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
+@app.api_route("/api/v1", methods=["GET", "HEAD"])
 def root():
     return {
         "status": "online",
@@ -71,7 +72,8 @@ def root():
     }
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
+@app.api_route("/api/v1/health", methods=["GET", "HEAD"])
 def health_check():
     return {"status": "healthy"}
 
