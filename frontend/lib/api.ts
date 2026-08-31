@@ -171,9 +171,21 @@ export interface RoadmapHistoryItem {
 }
 
 export async function fetchHistory(learner_id: string): Promise<RoadmapHistoryItem[]> {
-  const res = await fetch(`${API_BASE}/history/${learner_id}`);
-  if (!res.ok) throw new Error("Failed to fetch roadmap history");
-  return res.json();
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 7000);
+    const res = await fetch(`${API_BASE}/history/${learner_id}`, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      console.warn(`fetchHistory returned status ${res.status}`);
+      return [];
+    }
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (e) {
+    console.warn("fetchHistory failed or timed out:", e);
+    return [];
+  }
 }
 
 export async function activateHistoryRoadmap(learner_id: string, history_id: string): Promise<RoadmapData> {

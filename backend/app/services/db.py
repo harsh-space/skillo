@@ -129,7 +129,7 @@ class DatabaseClient:
             try:
                 with open(LOCAL_DB_FILE, "r", encoding="utf-8") as f:
                     stored = json.load(f)
-                    for dynamic_col in ["learners", "roadmaps", "feedback_events"]:
+                    for dynamic_col in ["learners", "roadmaps", "feedback_events", "roadmap_history", "users"]:
                         if dynamic_col in stored:
                             self.local_data[dynamic_col] = stored[dynamic_col]
             except Exception:

@@ -45,21 +45,38 @@ export default function HistoryDrawer({
     setMounted(true);
   }, []);
 
+  const getEffectiveLearnerId = (): string => {
+    if (learnerId) return learnerId;
+    try {
+      if (typeof window !== 'undefined') {
+        const s = localStorage.getItem('skillo_session');
+        if (s) {
+          const parsed = JSON.parse(s);
+          if (parsed.learner_id) return parsed.learner_id;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return 'learner_alex_101';
+  };
+
   const loadHistory = async () => {
-    if (!learnerId) return;
+    const targetId = getEffectiveLearnerId();
     setIsLoading(true);
     try {
-      const data = await fetchHistory(learnerId);
-      setHistoryItems(data);
+      const data = await fetchHistory(targetId);
+      setHistoryItems(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to load roadmap history:', err);
+      setHistoryItems([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (isOpen && learnerId) {
+    if (isOpen) {
       loadHistory();
     }
   }, [isOpen, learnerId]);
@@ -76,19 +93,17 @@ export default function HistoryDrawer({
   }, [isOpen, onClose]);
 
   const handleItemClick = async (item: RoadmapHistoryItem) => {
-    if (!learnerId) return;
+    const targetId = getEffectiveLearnerId();
     setActivatingId(item.history_id);
     try {
-      // Activate in DB and get the complete RoadmapResponse
-      const fullRoadmap = await activateHistoryRoadmap(learnerId, item.history_id);
-      // Immediately pass complete roadmap to Dashboard & transition view
-      onSelectRoadmap(fullRoadmap);
+      const activeData = await activateHistoryRoadmap(targetId, item.history_id);
+      onSelectRoadmap(activeData);
       onClose();
     } catch (err) {
-      console.error('Failed to switch roadmap:', err);
+      console.error('Failed to activate historical roadmap:', err);
       // Fallback: construct RoadmapData directly from item
       onSelectRoadmap({
-        learner_id: item.learner_id,
+        learner_id: targetId,
         target_role: item.target_role,
         target_role_id: item.target_role_id,
         roadmap: item.steps,
@@ -107,12 +122,14 @@ export default function HistoryDrawer({
 
   const handleDelete = async (e: React.MouseEvent, historyId: string) => {
     e.stopPropagation();
-    if (!learnerId) return;
+    const targetId = getEffectiveLearnerId();
     try {
-      await deleteHistoryItem(learnerId, historyId);
+      await deleteHistoryItem(targetId, historyId);
       setHistoryItems((prev) => prev.filter((h) => h.history_id !== historyId));
     } catch (err) {
       console.error('Failed to delete history item:', err);
+      // Optimistic removal
+      setHistoryItems((prev) => prev.filter((h) => h.history_id !== historyId));
     }
   };
 
