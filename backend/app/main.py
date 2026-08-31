@@ -49,15 +49,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API Routers under /api/v1
+# Include API Routers under /api/v1 and root fallback
 API_PREFIX = "/api/v1"
-app.include_router(auth.router, prefix=API_PREFIX)
-app.include_router(profile.router, prefix=API_PREFIX)
-app.include_router(goal.router, prefix=API_PREFIX)
-app.include_router(recommend.router, prefix=API_PREFIX)
-app.include_router(feedback.router, prefix=API_PREFIX)
-app.include_router(explain.router, prefix=API_PREFIX)
-app.include_router(taxonomy.router, prefix=API_PREFIX)
+for prefix in [API_PREFIX, ""]:
+    app.include_router(auth.router, prefix=prefix)
+    app.include_router(profile.router, prefix=prefix)
+    app.include_router(goal.router, prefix=prefix)
+    app.include_router(recommend.router, prefix=prefix)
+    app.include_router(feedback.router, prefix=prefix)
+    app.include_router(explain.router, prefix=prefix)
+    app.include_router(taxonomy.router, prefix=prefix)
 
 
 @app.get("/")
