@@ -27,7 +27,7 @@ class DatabaseClient:
     """
     def __init__(self):
         self.firestore_db = None
-        self._init_firestore()
+        self._firebase_ready = False
         self.local_data: Dict[str, Dict[str, Any]] = {
             "skills": {},
             "roles": {},
@@ -39,6 +39,9 @@ class DatabaseClient:
             "users": {}
         }
         self._load_local_db()
+        # Init Firebase in background thread so server starts instantly
+        import threading
+        threading.Thread(target=self._init_firestore, daemon=True).start()
 
     def _init_firestore(self):
         cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
