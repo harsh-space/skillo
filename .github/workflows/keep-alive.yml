@@ -2,7 +2,7 @@ name: Keep Render Alive
 
 on:
   schedule:
-    - cron: '*/14 * * * *'   # Every 14 minutes — just under Render's 15-min sleep threshold
+    - cron: '*/5 * * * *'   # Every 14 minutes — just under Render's 15-min sleep threshold
   workflow_dispatch:          # Allow manual trigger
 
 jobs:
