@@ -38,7 +38,11 @@ class DatabaseClient:
 
     def _init_firestore(self):
         cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-        cred_json_str = os.getenv("FIREBASE_CREDENTIALS_JSON")
+        cred_json_str = (
+            os.getenv("FIREBASE_CREDENTIALS_JSON")
+            or os.getenv("FIREBASE_KEY_JSON")
+            or os.getenv("FIREBASE_SERVICE_ACCOUNT")
+        )
 
         try:
             import firebase_admin

@@ -1,0 +1,22 @@
+# Environment and Secrets
+.env
+.env*
+*firebase-key.json
+*firbase-key.json
+*serviceAccountKey.json
+*.pem
+*.key
+
+# Git and dev caches
+.git
+.github
+.pytest_cache
+__pycache__
+*.pyc
+*.pyo
+
+# Node and frontend build artifacts
+frontend/node_modules
+frontend/.next
+frontend/out
+node_modules
