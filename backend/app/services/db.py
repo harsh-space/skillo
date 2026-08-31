@@ -3,6 +3,10 @@ import os
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
+# Prevent gRPC segmentation faults in containerized async environments
+os.environ["GRPC_ENABLE_FORK_SUPPORT"] = "0"
+os.environ["GRPC_POLL_STRATEGY"] = "epoll1"
+
 # Path for local persistence & project root
 APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(APP_DIR, "data")
@@ -136,9 +140,12 @@ class DatabaseClient:
                 pass
 
     def _save_local_db(self):
-        os.makedirs(DATA_DIR, exist_ok=True)
-        with open(LOCAL_DB_FILE, "w", encoding="utf-8") as f:
-            json.dump(self.local_data, f, indent=2)
+        try:
+            os.makedirs(DATA_DIR, exist_ok=True)
+            with open(LOCAL_DB_FILE, "w", encoding="utf-8") as f:
+                json.dump(self.local_data, f, indent=2)
+        except Exception as e:
+            print(f"[DB Warning] Could not write local db file: {e}")
 
     def set_document(self, collection: str, doc_id: str, data: Dict[str, Any]):
         if self.firestore_db:
