@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 _env_path = os.path.join(os.path.dirname(__file__), "..", "..", ".env")
 load_dotenv(dotenv_path=_env_path, override=False)
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
@@ -61,8 +61,8 @@ for prefix in [API_PREFIX, ""]:
     app.include_router(taxonomy.router, prefix=prefix)
 
 
-@app.api_route("/", methods=["GET", "HEAD"])
-@app.api_route("/api/v1", methods=["GET", "HEAD"])
+@app.get("/")
+@app.get("/api/v1")
 def root():
     return {
         "status": "online",
@@ -72,9 +72,11 @@ def root():
     }
 
 
-@app.api_route("/health", methods=["GET", "HEAD"])
-@app.api_route("/api/v1/health", methods=["GET", "HEAD"])
+@app.get("/health")
+@app.get("/api/v1/health")
 def health_check():
-    return {"status": "healthy"}
+    # Returning a raw Response object works flawlessly for BOTH GET and HEAD
+    # requests — Starlette auto-strips the body for HEAD without a 405 error.
+    return Response(content='{"status": "healthy"}', media_type="application/json")
 
 
