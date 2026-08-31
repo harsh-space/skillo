@@ -6,8 +6,7 @@
 
 > [!IMPORTANT]
 > You can test the application directly using the following deployed environments:
-> - **Live Web App**: [skillo-frontend-amber.vercel.app](https://skillo-frontend-amber.vercel.app/)
-> - **Backend API & Swagger Docs**: [skillo-backend-ooyl.onrender.com/docs](https://skillo-backend-ooyl.onrender.com/docs)
+> - **Live Web App & Full Stack API**: [skillo-frontend-amber.vercel.app](https://skillo-frontend-amber.vercel.app/)
 
 ---
 
@@ -172,25 +171,15 @@ docker run -p 8000:8000 skillo-ai
 
 ## Free Cloud Deployment
 
-You can host the entire app completely free using **Render** (for the backend) and **Vercel** (for the frontend):
+The entire application is hosted on **Vercel**:
 
-### 1. Deploy the Backend on Render
-1. Go to **[render.com](https://render.com)** and create a new **Web Service**.
-2. Connect this GitHub repository.
-3. Select **Docker** as the runtime.
-4. Add your environment variables:
-   - `GEMINI_API_KEY`: Your Google Gemini API Key.
-   - `FIREBASE_KEY_JSON`: *(Optional)* Copy-paste the contents of your `firebase-key.json` if using cloud Firestore.
-5. Click **Deploy**. You'll get a URL like `https://your-backend.onrender.com`.
-
-> **Tip**: Render's free tier goes to sleep after 15 minutes of inactivity. To keep it awake 24/7 with zero cold starts, create a free monitor at **[uptimerobot.com](https://uptimerobot.com)** that pings `https://your-backend.onrender.com/health` every 10 minutes.
-
-### 2. Deploy the Frontend on Vercel
+### Deploying on Vercel
 1. Go to **[vercel.com](https://vercel.com)** and import this GitHub repository.
 2. Set the **Root Directory** to `frontend`.
-3. Add one environment variable:
-   - `NEXT_PUBLIC_API_URL`: Your Render backend URL (e.g. `https://your-backend.onrender.com/api/v1`).
-4. Click **Deploy** — your live website is ready!
+3. Configure environment variables in Vercel project settings:
+   - `GEMINI_API_KEY`: *(Optional)* Your Google Gemini API Key for dynamic goal parsing.
+   - `FIREBASE_KEY_JSON`: *(Optional)* Copy-paste the contents of your `firebase-key.json` if connecting cloud Firestore.
+4. Click **Deploy** — Vercel builds the Next.js web application and routes API requests automatically.
 
 ---
 

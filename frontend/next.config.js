@@ -2,7 +2,7 @@
 const backendTarget = (
   process.env.BACKEND_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  'https://skillo-backend-ooyl.onrender.com'
+  'http://127.0.0.1:8000'
 ).trim().replace(/\/+$/, '').replace(/\/api\/v1$/, '');
 
 const nextConfig = {
