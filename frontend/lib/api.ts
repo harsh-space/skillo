@@ -1,5 +1,13 @@
-const rawBase = (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1").trim().replace(/\/+$/, "");
-const API_BASE = rawBase.endsWith("/api/v1") ? rawBase : `${rawBase}/api/v1`;
+const getApiBase = (): string => {
+  if (typeof window !== "undefined") {
+    // In browser: use relative path to route through Next.js proxy (100% same-origin, 0 CORS)
+    return "/api/v1";
+  }
+  const raw = (process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || "http://127.0.0.1:8000/api/v1").trim().replace(/\/+$/, "");
+  return raw.endsWith("/api/v1") ? raw : `${raw}/api/v1`;
+};
+
+const API_BASE = getApiBase();
 
 export interface Skill {
   skill_id: string;
