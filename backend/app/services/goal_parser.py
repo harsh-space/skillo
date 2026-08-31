@@ -40,7 +40,10 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
 
     if model != "fallback":
         try:
-            goal_vector = model.encode(goal_text)
+            if hasattr(model, "transform"):
+                goal_vector = model.transform([goal_text])
+            else:
+                goal_vector = model.encode(goal_text)
             
             best_role = None
             best_sim = -1.0
@@ -52,7 +55,10 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
                     f"Career Role: {r['name']}. {r.get('description', '')} "
                     f"Core competencies and technical skills: {', '.join(role_skills)}."
                 )
-                role_vector = model.encode(role_semantic_text)
+                if hasattr(model, "transform"):
+                    role_vector = model.transform([role_semantic_text])
+                else:
+                    role_vector = model.encode(role_semantic_text)
                 sim = _compute_cosine_similarity(goal_vector, role_vector)
                 
                 # Check exact title or keyword alias matches

@@ -5,40 +5,63 @@ from app.models.schemas import GapSummary, GapSkillDetail
 
 SIMILARITY_THRESHOLD = 0.60
 
-# Model cache
-_embedding_model: Any = None
-_skill_embeddings_cache: Dict[str, np.ndarray] = {}
+# Lightweight Semantic Vectorizer (under 30MB RAM footprint)
+_vectorizer: Any = None
+_all_corpus_texts: List[str] = []
+
+
+def _get_vectorizer() -> Any:
+    global _vectorizer
+    if _vectorizer is None:
+        try:
+            from sklearn.feature_extraction.text import TfidfVectorizer
+            # Character n-gram + word analyzer handles typos, subwords, and abbreviations flawlessly
+            _vectorizer = TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5), sublinear_tf=True)
+            # Fit on initial taxonomy corpus
+            skills = db.list_documents("skills")
+            roles = db.list_documents("roles")
+            corpus = [f"{s.get('name', '')} {s.get('description', '')}" for s in skills]
+            corpus.extend([f"{r.get('name', '')} {r.get('description', '')}" for r in roles])
+            if corpus:
+                _vectorizer.fit(corpus)
+        except Exception as e:
+            print(f"[GapAnalysis Warning] Could not initialize TfidfVectorizer: {e}")
+            _vectorizer = "fallback"
+    return _vectorizer
 
 
 def get_embedding_model() -> Any:
-    global _embedding_model
-    if _embedding_model is None:
-        try:
-            from sentence_transformers import SentenceTransformer
-            _embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-            print("[GapAnalysis] Loaded sentence-transformers model all-MiniLM-L6-v2.")
-        except Exception as e:
-            print(f"[GapAnalysis Warning] Could not load SentenceTransformer ({e}). Using semantic fallback.")
-            _embedding_model = "fallback"
-    return _embedding_model
+    """Returns vectorizer for semantic matching."""
+    return _get_vectorizer()
 
 
 def _compute_cosine_similarity(vec_a: Any, vec_b: Any) -> float:
     if vec_a is None or vec_b is None:
         return 0.0
-    arr_a = np.asarray(vec_a, dtype=np.float32)
-    arr_b = np.asarray(vec_b, dtype=np.float32)
-    norm_a = float(np.linalg.norm(arr_a))
-    norm_b = float(np.linalg.norm(arr_b))
-    if norm_a == 0.0 or norm_b == 0.0:
+    try:
+        if hasattr(vec_a, "toarray"):
+            arr_a = vec_a.toarray().flatten()
+        else:
+            arr_a = np.asarray(vec_a, dtype=np.float32).flatten()
+            
+        if hasattr(vec_b, "toarray"):
+            arr_b = vec_b.toarray().flatten()
+        else:
+            arr_b = np.asarray(vec_b, dtype=np.float32).flatten()
+
+        norm_a = float(np.linalg.norm(arr_a))
+        norm_b = float(np.linalg.norm(arr_b))
+        if norm_a == 0.0 or norm_b == 0.0:
+            return 0.0
+        return float(np.dot(arr_a, arr_b) / (norm_a * norm_b))
+    except Exception:
         return 0.0
-    return float(np.dot(arr_a, arr_b) / (norm_a * norm_b))
 
 
 def _fallback_similarity(text_a: str, text_b: str) -> float:
     """Token-level Jaccard & substring similarity fallback"""
-    a_low = text_a.lower()
-    b_low = text_b.lower()
+    a_low = text_a.lower().strip()
+    b_low = text_b.lower().strip()
     if a_low == b_low:
         return 1.0
     if a_low in b_low or b_low in a_low:
@@ -51,16 +74,14 @@ def _fallback_similarity(text_a: str, text_b: str) -> float:
     return len(intersection) / len(words_a.union(words_b))
 
 
-def get_skill_embedding(skill_name: str, skill_desc: str = "") -> Optional[np.ndarray]:
+def get_skill_embedding(skill_name: str, skill_desc: str = "") -> Optional[Any]:
     text = f"{skill_name}: {skill_desc}" if skill_desc else skill_name
-    if text in _skill_embeddings_cache:
-        return _skill_embeddings_cache[text]
-    model = get_embedding_model()
-    if model != "fallback" and hasattr(model, "encode"):
-        vec = model.encode(text)
-        arr = np.asarray(vec, dtype=np.float32)
-        _skill_embeddings_cache[text] = arr
-        return arr
+    vec_engine = _get_vectorizer()
+    if vec_engine != "fallback" and hasattr(vec_engine, "transform"):
+        try:
+            return vec_engine.transform([text])
+        except Exception:
+            pass
     return None
 
 
