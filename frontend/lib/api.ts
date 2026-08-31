@@ -131,29 +131,53 @@ export interface UserSession {
 }
 
 export async function signupUser(name: string, email: string, password: string): Promise<UserSession> {
-  const res = await fetch(`${API_BASE}/auth/signup`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, email, password }),
-  });
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.detail || "Failed to sign up. Please check your credentials.");
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
+  try {
+    const res = await fetch(`${API_BASE}/auth/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.detail || `Sign up failed (HTTP ${res.status}).`);
+    }
+    return await res.json();
+  } catch (err: any) {
+    clearTimeout(timeoutId);
+    if (err.name === "AbortError") {
+      throw new Error("Backend server is waking up. Please try again in 5 seconds.");
+    }
+    throw err;
   }
-  return res.json();
 }
 
 export async function loginUser(email: string, password: string): Promise<UserSession> {
-  const res = await fetch(`${API_BASE}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.detail || "Invalid email or password.");
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
+  try {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.detail || "Invalid email or password.");
+    }
+    return await res.json();
+  } catch (err: any) {
+    clearTimeout(timeoutId);
+    if (err.name === "AbortError") {
+      throw new Error("Backend server is waking up. Please try again in 5 seconds.");
+    }
+    throw err;
   }
-  return res.json();
 }
 
 export interface RoadmapHistoryItem {
