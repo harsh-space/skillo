@@ -77,21 +77,21 @@ export default function AuthCard({ onAuthSuccess }: AuthCardProps) {
   };
 
   return (
-    <div className="max-w-sm mx-auto py-4 px-4 animate-in fade-in zoom-in-95 duration-200">
+    <div className="max-w-lg mx-auto py-4 px-2 sm:px-4 animate-in fade-in zoom-in-95 duration-200 flex flex-col items-center">
       {/* Title & Slogan */}
-      <div className="text-center mb-4 space-y-1">
-        <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent">
-          {mode === 'signin' ? 'Welcome Back' : 'Create Account'}
+      <div className="text-center mb-4 space-y-1.5 w-full">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent">
+          Welcome!
         </h1>
         <p className="text-xs text-slate-400">
           {mode === 'signin'
             ? 'Sign in to access your personalized learning roadmaps'
-            : 'Get started on your tech career roadmap'}
+            : 'Create an account to start your career journey'}
         </p>
       </div>
 
       {/* Auth Card Container */}
-      <div className="glass-card rounded-2xl border border-slate-800/90 shadow-2xl p-5 sm:p-6 relative overflow-hidden backdrop-blur-xl bg-slate-950/60">
+      <div className="glass-card rounded-2xl border border-slate-800/90 shadow-2xl p-5 sm:p-6 relative overflow-hidden backdrop-blur-xl bg-slate-950/60 w-full max-w-sm">
         
         {/* Mode Toggle Tabs */}
         <div className="grid grid-cols-2 p-1 bg-slate-900/80 rounded-xl border border-slate-800/80 mb-4">

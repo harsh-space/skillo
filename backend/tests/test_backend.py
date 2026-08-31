@@ -134,9 +134,9 @@ def test_adaptive_feedback_remedial_insertion():
         "target_role_id": "role_backend_developer"
     })
 
-    # Generate initial roadmap
+    # Generate initial roadmap with force_regenerate
     from app.api.recommend import generate_recommendation
-    initial_rec = generate_recommendation(RecommendRequest(learner_id=learner_id))
+    initial_rec = generate_recommendation(RecommendRequest(learner_id=learner_id, force_regenerate=True))
     
     first_step = initial_rec.roadmap[0]
     initial_len = len(initial_rec.roadmap)

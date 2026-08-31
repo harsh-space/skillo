@@ -154,3 +154,40 @@ export async function loginUser(email: string, password: string): Promise<UserSe
   }
   return res.json();
 }
+
+export interface RoadmapHistoryItem {
+  history_id: string;
+  learner_id: string;
+  target_role: string;
+  target_role_id: string;
+  created_at: string;
+  updated_at: string;
+  total_tasks: number;
+  completed_tasks: number;
+  progress_percentage: number;
+  steps: RoadmapStep[];
+  is_active: boolean;
+}
+
+export async function fetchHistory(learner_id: string): Promise<RoadmapHistoryItem[]> {
+  const res = await fetch(`${API_BASE}/history/${learner_id}`);
+  if (!res.ok) throw new Error("Failed to fetch roadmap history");
+  return res.json();
+}
+
+export async function activateHistoryRoadmap(learner_id: string, history_id: string): Promise<RoadmapData> {
+  const res = await fetch(`${API_BASE}/history/activate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ learner_id, history_id }),
+  });
+  if (!res.ok) throw new Error("Failed to switch roadmap");
+  return res.json();
+}
+
+export async function deleteHistoryItem(learner_id: string, history_id: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/history/${learner_id}/${history_id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("Failed to delete history item");
+}

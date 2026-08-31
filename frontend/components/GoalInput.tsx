@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Brain, ArrowRight, ArrowLeft, CheckCircle, Search, Layers, User } from 'lucide-react';
-import { Skill, fetchTaxonomy, saveProfile, parseGoal } from '../lib/api';
+import { Skill, fetchTaxonomy, saveProfile, parseGoal, generateRoadmap } from '../lib/api';
 
 interface GoalInputProps {
   userName?: string;
@@ -74,7 +74,10 @@ export default function GoalInput({ onComplete, userName, learnerId }: GoalInput
       // 2. Save Learner Profile
       await saveProfile(effectiveId, effectiveName, selectedSkills, goalRes.target_role_id);
 
-      // 3. Trigger parent transition
+      // 3. Generate fresh roadmap for the newly chosen role
+      await generateRoadmap(effectiveId);
+
+      // 4. Trigger parent transition
       onComplete({
         learner_id: effectiveId,
         name: effectiveName,
@@ -104,16 +107,12 @@ export default function GoalInput({ onComplete, userName, learnerId }: GoalInput
   );
 
   return (
-    <div className="max-w-4xl mx-auto py-4 sm:py-5 px-4">
+    <div className="max-w-4xl mx-auto pt-10 sm:pt-14 md:pt-18 pb-8 px-4">
       {/* Header */}
-      <div className="text-center mb-5 space-y-2">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent whitespace-normal sm:whitespace-nowrap pb-1.5 leading-normal">
-          AI Personalized Learning Assistant
-        </h1>
-
-        <div className="max-w-2xl mx-auto pt-1">
-          <p className="text-base sm:text-lg font-medium text-slate-200 tracking-tight">
-            Map your skills. <span className="bg-gradient-to-r from-indigo-300 to-cyan-300 bg-clip-text text-transparent font-semibold">Chart your path.</span>
+      <div className="text-center mb-6 space-y-1">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl font-semibold text-slate-200 tracking-tight">
+            Map your skills. <span className="bg-gradient-to-r from-indigo-300 to-cyan-300 bg-clip-text text-transparent font-bold">Chart your path.</span>
           </p>
         </div>
       </div>
@@ -237,11 +236,6 @@ export default function GoalInput({ onComplete, userName, learnerId }: GoalInput
         </div>
       </form>
 
-      <div className="text-center mt-6">
-        <p className="text-sm sm:text-base text-slate-400">
-          Our AI bridges the gap with an adaptive, milestone-driven roadmap.
-        </p>
-      </div>
     </div>
   );
 }

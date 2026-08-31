@@ -5,12 +5,15 @@ import GoalInput from '../components/GoalInput';
 import Dashboard from '../components/Dashboard';
 import OrbitBackground from '../components/OrbitBackground';
 import AuthCard from '../components/AuthCard';
-import { UserSession } from '../lib/api';
-import { User, LogOut } from 'lucide-react';
+import HistoryDrawer from '../components/HistoryDrawer';
+import { UserSession, RoadmapData } from '../lib/api';
+import { History, LogOut } from 'lucide-react';
 
 export default function Home() {
   const [session, setSession] = useState<UserSession | null>(null);
   const [currentStep, setCurrentStep] = useState<'auth' | 'onboarding' | 'dashboard'>('auth');
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [activeRoadmapData, setActiveRoadmapData] = useState<RoadmapData | null>(null);
   const [learnerData, setLearnerData] = useState<{
     learner_id: string;
     name: string;
@@ -49,6 +52,7 @@ export default function Home() {
   const handleLogout = () => {
     setSession(null);
     setLearnerData(null);
+    setActiveRoadmapData(null);
     try {
       localStorage.removeItem('skillo_session');
     } catch {
@@ -65,24 +69,53 @@ export default function Home() {
     target_role_id: string;
     target_skills: string[];
   }) => {
+    setActiveRoadmapData(null);
     setLearnerData(data);
     setCurrentStep('dashboard');
   };
 
+  const handleSelectHistoryRoadmap = (data: RoadmapData) => {
+    setActiveRoadmapData(data);
+    setLearnerData({
+      learner_id: data.learner_id,
+      name: session?.name || 'Learner',
+      current_skills: data.roadmap.filter((s) => s.status === 'completed').map((s) => s.skill_name),
+      target_role: data.target_role,
+      target_role_id: data.target_role_id,
+      target_skills: data.roadmap.map((s) => s.skill_name),
+    });
+    setCurrentStep('dashboard');
+  };
+
   const handleReset = () => {
+    setActiveRoadmapData(null);
     setCurrentStep('onboarding');
   };
 
   return (
-    <main className={`min-h-screen relative overflow-x-hidden ${currentStep === 'onboarding' || currentStep === 'auth' ? 'overflow-y-hidden h-screen' : ''}`}>
+    <main className={`min-h-screen relative overflow-x-hidden ${currentStep === 'onboarding' || currentStep === 'auth' ? 'md:overflow-y-hidden md:h-screen overflow-y-auto min-h-screen' : ''}`}>
       {/* Background Orbit & Starfield */}
       <OrbitBackground isDashboard={currentStep === 'dashboard'} />
 
       {/* Top Brand Header Banner */}
-      <header className="border-b border-slate-800/80 bg-slate-950/50 backdrop-blur-md sticky top-0 z-40 py-3 sm:py-3.5 shadow-lg shadow-black/20 px-4 sm:px-8">
+      <header className="border-b border-slate-800/80 bg-slate-950/50 backdrop-blur-md sticky top-0 z-40 py-2.5 sm:py-3.5 shadow-lg shadow-black/20 px-3 sm:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Left spacer / empty container for perfect centering */}
-          <div className="w-24 sm:w-36 hidden sm:block" />
+          {/* Left History Drawer Trigger Button */}
+          <div className="w-auto sm:w-36 flex items-center justify-start">
+            {session ? (
+              <button
+                type="button"
+                onClick={() => setIsHistoryOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold shadow-sm transition-all cursor-pointer active:scale-95 group"
+                title="View Past Roadmaps & Completed Tasks History"
+              >
+                <History className="w-3.5 h-3.5 text-indigo-400 group-hover:rotate-[-20deg] transition-transform" />
+                <span className="hidden sm:inline">History</span>
+              </button>
+            ) : (
+              <div className="w-20 hidden sm:block" />
+            )}
+          </div>
 
           {/* Centered Brand Title */}
           <div className="flex flex-col items-center justify-center text-center gap-0.5 mx-auto">
@@ -107,7 +140,7 @@ export default function Home() {
                 <button
                   onClick={handleLogout}
                   title="Sign out"
-                  className="text-slate-400 hover:text-red-400 transition-colors p-1 rounded-full hover:bg-slate-800"
+                  className="text-slate-400 hover:text-red-400 transition-colors p-1 rounded-full hover:bg-slate-800 cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                 </button>
@@ -152,13 +185,27 @@ export default function Home() {
                 }`}
               >
                 {learnerData ? (
-                  <Dashboard learnerData={learnerData} onReset={handleReset} />
+                  <Dashboard
+                    key={`${learnerData.learner_id}_${learnerData.target_role_id}`}
+                    learnerData={learnerData}
+                    initialRoadmapData={activeRoadmapData}
+                    onReset={handleReset}
+                  />
                 ) : null}
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* Slide-out History Drawer */}
+      <HistoryDrawer
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        learnerId={session?.learner_id}
+        onSelectRoadmap={handleSelectHistoryRoadmap}
+        onNewRoadmap={() => setCurrentStep('onboarding')}
+      />
     </main>
   );
 }

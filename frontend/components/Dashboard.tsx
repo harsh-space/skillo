@@ -29,12 +29,13 @@ interface DashboardProps {
     target_role_id: string;
     target_skills: string[];
   };
+  initialRoadmapData?: RoadmapData | null;
   onReset: () => void;
 }
 
-export default function Dashboard({ learnerData, onReset }: DashboardProps) {
-  const [roadmapData, setRoadmapData] = useState<RoadmapData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export default function Dashboard({ learnerData, initialRoadmapData, onReset }: DashboardProps) {
+  const [roadmapData, setRoadmapData] = useState<RoadmapData | null>(initialRoadmapData || null);
+  const [isLoading, setIsLoading] = useState(!initialRoadmapData);
   const [activeExplainStep, setActiveExplainStep] = useState<RoadmapStep | null>(null);
   const [activeQuizStep, setActiveQuizStep] = useState<RoadmapStep | null>(null);
   
@@ -45,8 +46,8 @@ export default function Dashboard({ learnerData, onReset }: DashboardProps) {
   const loadRoadmap = async () => {
     setIsLoading(true);
     try {
-      // Always generate/recalculate fresh roadmap
-      const data = await generateRoadmap(learnerData.learner_id);
+      // Read the persisted roadmap from DB (preserves all quiz status changes)
+      const data = await fetchRoadmap(learnerData.learner_id);
       setRoadmapData(data);
     } catch (err) {
       console.error('Roadmap fetch error:', err);
@@ -55,9 +56,27 @@ export default function Dashboard({ learnerData, onReset }: DashboardProps) {
     }
   };
 
+  const refreshRoadmap = async () => {
+    setIsLoading(true);
+    try {
+      // Force-regenerate fresh roadmap from current skills (wipes quiz status)
+      const data = await generateRoadmap(learnerData.learner_id);
+      setRoadmapData(data);
+    } catch (err) {
+      console.error('Roadmap refresh error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    loadRoadmap();
-  }, [learnerData.learner_id]);
+    if (initialRoadmapData && initialRoadmapData.target_role_id === learnerData.target_role_id) {
+      setRoadmapData(initialRoadmapData);
+      setIsLoading(false);
+    } else {
+      loadRoadmap();
+    }
+  }, [learnerData.learner_id, learnerData.target_role_id, initialRoadmapData]);
 
   // Click outside to close active panel
   useEffect(() => {
@@ -203,10 +222,10 @@ export default function Dashboard({ learnerData, onReset }: DashboardProps) {
                 {/* 5. Refresh Path Button */}
                 <button
                   type="button"
-                  onClick={loadRoadmap}
+                  onClick={refreshRoadmap}
                   disabled={isLoading}
                   className="px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 group"
-                  title="Refresh Path"
+                  title="Recalculate Path from scratch"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 text-slate-300 group-hover:text-white transition-transform ${isLoading ? 'animate-spin' : 'group-hover:rotate-45'}`} />
                   <span className="hidden sm:inline">Refresh</span>
@@ -290,22 +309,46 @@ export default function Dashboard({ learnerData, onReset }: DashboardProps) {
                 {/* Gap Analysis Panel Content */}
                 {activeFloatingPanel === 'gap' && (
                   <div className="space-y-3">
-                    {roadmapData?.gap_summary && (
-                      <div>
-                        <span className="text-xs text-slate-400 block mb-2 font-medium">Identified Competency Gaps for {roadmapData.target_role}:</span>
-                        <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto pr-1">
-                          {roadmapData.gap_summary.missing_skills.map((skill, idx) => (
-                            <span
-                              key={idx}
-                              className="px-3 py-1 rounded-lg bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs font-medium flex items-center gap-1.5"
-                            >
-                              <Clock className="w-3 h-3 text-rose-400" />
-                              {skill}
+                    <span className="text-xs text-slate-400 block font-medium">
+                      Skill Gap Trajectory for {roadmapData?.target_role || learnerData.target_role}:
+                    </span>
+                    <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto pr-1">
+                      {/* 1. Remaining Incomplete Steps */}
+                      {roadmap
+                        .filter((s) => s.status !== 'completed')
+                        .map((s, idx) => (
+                          <span
+                            key={`rem_${idx}`}
+                            className={`px-3 py-1 rounded-lg border text-xs font-medium flex items-center gap-1.5 ${
+                              s.is_remedial
+                                ? 'bg-amber-950/40 border-amber-500/30 text-amber-300'
+                                : s.status === 'in_progress'
+                                ? 'bg-indigo-950/40 border-indigo-500/30 text-indigo-300'
+                                : 'bg-rose-950/40 border-rose-500/30 text-rose-300'
+                            }`}
+                          >
+                            <Clock className="w-3 h-3 text-rose-400" />
+                            {s.skill_name}
+                            <span className="text-[10px] opacity-70">
+                              ({s.is_remedial ? 'Remedial' : s.status === 'in_progress' ? 'In Progress' : 'Pending'})
                             </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                          </span>
+                        ))}
+
+                      {/* 2. Completed Steps from Gap */}
+                      {roadmap
+                        .filter((s) => s.status === 'completed')
+                        .map((s, idx) => (
+                          <span
+                            key={`comp_gap_${idx}`}
+                            className="px-3 py-1 rounded-lg bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 text-xs font-medium flex items-center gap-1.5 opacity-80"
+                          >
+                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                            <span className="line-through opacity-80">{s.skill_name}</span>
+                            <span className="text-[10px] text-emerald-400 font-semibold">(Mastered)</span>
+                          </span>
+                        ))}
+                    </div>
                   </div>
                 )}
 

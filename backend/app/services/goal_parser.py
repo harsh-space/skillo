@@ -25,6 +25,19 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
     model = get_embedding_model()
     skill_map = {s["skill_id"]: s["name"] for s in skills}
     
+    # Keyword and abbreviation alias mapping
+    alias_map = {
+        "role_ml_engineer": ["ml", "machine learning", "deep learning", "predictive model", "data science", "pytorch", "tensorflow"],
+        "role_ai_engineer": ["ai", "artificial intelligence", "genai", "generative ai", "llm", "rag", "agents", "langchain", "prompt engineering"],
+        "role_frontend_developer": ["frontend", "front-end", "front end", "ui", "ux", "react", "nextjs", "next.js", "css", "html", "javascript", "client-side"],
+        "role_backend_developer": ["backend", "back-end", "back end", "server", "fastapi", "django", "flask", "database", "sql", "orm", "rest api", "microservices"],
+        "role_devops_engineer": ["devops", "sre", "cloud", "infrastructure", "kubernetes", "k8s", "docker", "ci/cd", "pipeline", "aws", "terraform"],
+        "role_fullstack_developer": ["fullstack", "full stack", "full-stack", "mern", "end to end", "end-to-end"]
+    }
+
+    goal_lower = goal_text.lower()
+    goal_words = set(re.findall(r"\b[a-z0-9\-_.]+\b", goal_lower))
+
     if model != "fallback":
         try:
             goal_vector = model.encode(goal_text)
@@ -33,6 +46,7 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
             best_sim = -1.0
             
             for r in roles:
+                r_id = r.get("role_id", "")
                 role_skills = [skill_map.get(s_id, s_id) for s_id in r.get("required_skills", [])]
                 role_semantic_text = (
                     f"Career Role: {r['name']}. {r.get('description', '')} "
@@ -41,11 +55,17 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
                 role_vector = model.encode(role_semantic_text)
                 sim = _compute_cosine_similarity(goal_vector, role_vector)
                 
-                # Boost if the exact role title words are present in the goal
-                if r["name"].lower() in goal_text.lower():
-                    sim += 0.30
-                elif any(word in goal_text.lower() for word in r["name"].lower().split() if len(word) > 3):
-                    sim += 0.10
+                # Check exact title or keyword alias matches
+                if r["name"].lower() in goal_lower:
+                    sim += 0.40
+                
+                # Alias matching boost
+                aliases = alias_map.get(r_id, [])
+                for alias in aliases:
+                    if alias in goal_lower:
+                        sim += 0.35
+                    elif alias in goal_words:
+                        sim += 0.35
                 
                 if sim > best_sim:
                     best_sim = sim
@@ -63,15 +83,21 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
             print(f"[GoalParser Warning] Semantic embedding parse failed: {e}. Using token fallback.")
 
     # Token fallback if model is unavailable
-    goal_lower = goal_text.lower()
     best_role = None
     best_score = -1
 
     for r in roles:
+        r_id = r.get("role_id", "")
         role_skills = [skill_map.get(s_id, s_id).lower() for s_id in r.get("required_skills", [])]
         score = sum(1 for sk in role_skills if sk in goal_lower)
         if r["name"].lower() in goal_lower:
-            score += 3
+            score += 5
+        
+        # Check alias
+        for alias in alias_map.get(r_id, []):
+            if alias in goal_lower or alias in goal_words:
+                score += 4
+
         if score > best_score:
             best_score = score
             best_role = r
@@ -88,10 +114,11 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
     )
 
 
+import asyncio
+
+
 async def _try_gemini(goal_text: str, roles, skills) -> GoalParseResponse | None:
-    """Calls Gemini via the official google-genai SDK with gemini-flash-latest.
-    Natively supports both new Authorization keys (AQ.*) and legacy standard keys (AIza*).
-    """
+    """Calls Gemini via the official google-genai SDK with gemini-flash-latest."""
     gemini_key = os.getenv("GEMINI_API_KEY")
     if not gemini_key:
         return None
@@ -108,13 +135,18 @@ async def _try_gemini(goal_text: str, roles, skills) -> GoalParseResponse | None
         )
 
         client = genai.Client(api_key=gemini_key)
-        response = client.models.generate_content(
-            model='gemini-flash-latest',
-            contents=prompt
+        
+        # Run with a 3.0 second timeout to prevent blocking when Gemini is 503/overloaded
+        loop = asyncio.get_event_loop()
+        response = await asyncio.wait_for(
+            loop.run_in_executor(None, lambda: client.models.generate_content(
+                model='gemini-flash-latest',
+                contents=prompt
+            )),
+            timeout=3.0
         )
         
-        raw = response.text.strip()
-        # Strip markdown code fences if present
+        raw = response.text.strip() if response.text else ""
         raw = re.sub(r"^```(?:json)?\s*", "", raw)
         raw = re.sub(r"\s*```$", "", raw)
         
@@ -129,13 +161,11 @@ async def _try_gemini(goal_text: str, roles, skills) -> GoalParseResponse | None
                 target_role=matched_role["name"],
                 target_role_id=matched_role["role_id"],
                 target_skills=target_skills,
-                parsed_intent=f"Gemini 1.5/2.0 Flash: {parsed.get('intent_summary', 'Extracted target role')}"
+                parsed_intent=f"Gemini Flash: {parsed.get('intent_summary', 'Extracted target role')}"
             )
     except Exception as e:
-        print(f"[GoalParser] Gemini SDK call failed: {e}")
+        print(f"[GoalParser] Gemini SDK call bypassed or failed: {e}")
     return None
-
-
 
 
 async def _try_openai(goal_text: str, roles, skills) -> GoalParseResponse | None:
@@ -152,7 +182,7 @@ async def _try_openai(goal_text: str, roles, skills) -> GoalParseResponse | None
             f'Respond with ONLY a valid JSON object:\n'
             f'{{"target_role": "<One role from the list>", "intent_summary": "<Brief 1-sentence summary>"}}'
         )
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with httpx.AsyncClient(timeout=3.0) as client:
             res = await client.post(
                 "https://api.openai.com/v1/chat/completions",
                 headers={"Authorization": f"Bearer {openai_key}"},
@@ -182,14 +212,15 @@ async def parse_goal(goal_text: str) -> GoalParseResponse:
     """
     Parses a free-text learning goal into a structured target_role + target_skills,
     constrained to the curated taxonomy.
-
-    Resolution order:
-      1. Gemini 1.5 Flash (free, fast) — if GEMINI_API_KEY is set
-      2. OpenAI GPT-3.5-turbo         — if OPENAI_API_KEY is set
-      3. Local dense semantic fallback — sentence-transformers cosine similarity (zero cost, always available)
     """
     roles, skills = _get_taxonomy_context()
 
+    # Fast dense vector matching (with exact keywords/abbreviation boosts for instant sub-10ms resolution)
+    semantic_res = _semantic_embed_parse(goal_text, roles, skills)
+    if semantic_res:
+        return semantic_res
+
+    # Try LLMs for nuanced edge cases
     result = await _try_gemini(goal_text, roles, skills)
     if result:
         return result
@@ -198,6 +229,5 @@ async def parse_goal(goal_text: str) -> GoalParseResponse:
     if result:
         return result
 
-    # Always-available local fallback: dense semantic vector matching
-    return _semantic_embed_parse(goal_text, roles, skills)
+    return semantic_res
 
