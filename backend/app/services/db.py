@@ -82,7 +82,11 @@ class DatabaseClient:
                 cred = credentials.Certificate(resolved_path)
                 print(f"[DB] Initializing Firebase with key from: {resolved_path}")
             elif cred_json_str:
-                cred_dict = json.loads(cred_json_str)
+                cred_dict = json.loads(cred_json_str) if isinstance(cred_json_str, str) else cred_json_str
+                # Normalize escaped newlines in private_key if passed via env var
+                if isinstance(cred_dict, dict) and "private_key" in cred_dict:
+                    if "\\n" in cred_dict["private_key"]:
+                        cred_dict["private_key"] = cred_dict["private_key"].replace("\\n", "\n")
                 cred = credentials.Certificate(cred_dict)
 
             if cred:
@@ -148,32 +152,51 @@ class DatabaseClient:
             print(f"[DB Warning] Could not write local db file: {e}")
 
     def set_document(self, collection: str, doc_id: str, data: Dict[str, Any]):
-        if self.firestore_db:
-            try:
-                self.firestore_db.collection(collection).document(doc_id).set(data)
-            except Exception as e:
-                print(f"[DB Error] Firestore set failed: {e}, saving locally.")
         if collection not in self.local_data:
             self.local_data[collection] = {}
         self.local_data[collection][doc_id] = data
         self._save_local_db()
 
-    def get_document(self, collection: str, doc_id: str) -> Optional[Dict[str, Any]]:
         if self.firestore_db:
             try:
-                doc = self.firestore_db.collection(collection).document(doc_id).get()
+                self.firestore_db.collection(collection).document(doc_id).set(data, timeout=3.0)
+            except Exception as e:
+                print(f"[DB Error] Firestore set failed for {collection}/{doc_id}: {e}")
+
+    def get_document(self, collection: str, doc_id: str) -> Optional[Dict[str, Any]]:
+        # Fast memory check first
+        local_val = self.local_data.get(collection, {}).get(doc_id)
+        if local_val:
+            return local_val
+
+        if self.firestore_db:
+            try:
+                doc = self.firestore_db.collection(collection).document(doc_id).get(timeout=3.0)
                 if doc.exists:
-                    return doc.to_dict()
+                    val = doc.to_dict()
+                    if val:
+                        if collection not in self.local_data:
+                            self.local_data[collection] = {}
+                        self.local_data[collection][doc_id] = val
+                        return val
             except Exception:
                 pass
-        self._load_local_db()
-        return self.local_data.get(collection, {}).get(doc_id)
+        return None
 
     def list_documents(self, collection: str) -> List[Dict[str, Any]]:
+        # 1. Fast static taxonomy return
+        if collection in ["skills", "roles", "prerequisites", "resources"]:
+            self._load_local_db()
+            items = list(self.local_data.get(collection, {}).values())
+            if items:
+                return items
+
         if self.firestore_db:
             try:
-                docs = self.firestore_db.collection(collection).stream()
-                return [d.to_dict() for d in docs]
+                docs = self.firestore_db.collection(collection).stream(timeout=3.0)
+                res = [d.to_dict() for d in docs if d.exists]
+                if res:
+                    return res
             except Exception:
                 pass
         self._load_local_db()
@@ -185,24 +208,31 @@ class DatabaseClient:
         self.set_document(collection, doc_id, doc)
 
     def delete_document(self, collection: str, doc_id: str):
-        if self.firestore_db:
-            try:
-                self.firestore_db.collection(collection).document(doc_id).delete()
-            except Exception:
-                pass
         if collection in self.local_data and doc_id in self.local_data[collection]:
             del self.local_data[collection][doc_id]
             self._save_local_db()
 
-    def query_documents(self, collection: str, field: str, value: Any) -> List[Dict[str, Any]]:
         if self.firestore_db:
             try:
-                docs = self.firestore_db.collection(collection).where(field, "==", value).stream()
-                return [d.to_dict() for d in docs]
+                self.firestore_db.collection(collection).document(doc_id).delete(timeout=3.0)
             except Exception:
                 pass
-        docs = list(self.local_data.get(collection, {}).values())
-        return [d for d in docs if d.get(field) == value]
+
+    def query_documents(self, collection: str, field: str, value: Any) -> List[Dict[str, Any]]:
+        # 1. Fast local memory query first
+        local_matches = [d for d in self.local_data.get(collection, {}).values() if d.get(field) == value]
+        if local_matches:
+            return local_matches
+
+        if self.firestore_db:
+            try:
+                docs = self.firestore_db.collection(collection).where(field, "==", value).stream(timeout=3.0)
+                res = [d.to_dict() for d in docs if d.exists]
+                if res:
+                    return res
+            except Exception:
+                pass
+        return local_matches
 
 
 # Global singleton instance
