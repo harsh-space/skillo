@@ -166,21 +166,6 @@ If you have Docker installed, you can run the whole app with:
 docker build -t skillo-ai .
 docker run -p 8000:8000 skillo-ai
 ```
-
----
-
-## Free Cloud Deployment
-
-The entire application is hosted on **Vercel**:
-
-### Deploying on Vercel
-1. Go to **[vercel.com](https://vercel.com)** and import this GitHub repository.
-2. Set the **Root Directory** to `frontend`.
-3. Configure environment variables in Vercel project settings:
-   - `GEMINI_API_KEY`: *(Optional)* Your Google Gemini API Key for dynamic goal parsing.
-   - `FIREBASE_KEY_JSON`: *(Optional)* Copy-paste the contents of your `firebase-key.json` if connecting cloud Firestore.
-4. Click **Deploy** — Vercel builds the Next.js web application and routes API requests automatically.
-
 ---
 
 ## Try This Example
