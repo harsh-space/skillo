@@ -109,7 +109,7 @@ def run_gap_analysis(
 
     required_skill_ids = role.get("required_skills", [])
     model = get_embedding_model()
-    has_encoder = model != "fallback" and hasattr(model, "encode")
+    has_encoder = model != "fallback" and (hasattr(model, "encode") or hasattr(model, "transform"))
 
     # Pre-encode learner current skills
     current_embeddings = []
