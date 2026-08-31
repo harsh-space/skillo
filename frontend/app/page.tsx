@@ -112,11 +112,7 @@ export default function Home() {
                   <LogOut className="w-3.5 h-3.5" />
                 </button>
               </div>
-            ) : (
-              <div className="text-[11px] text-slate-400 font-medium hidden sm:block">
-                Not signed in
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       </header>
