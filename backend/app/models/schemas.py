@@ -68,6 +68,7 @@ class GapSummary(BaseModel):
 
 class RecommendRequest(BaseModel):
     learner_id: str
+    force_regenerate: bool = False
 
 
 class RoadmapResponse(BaseModel):
@@ -100,3 +101,41 @@ class ExplanationResponse(BaseModel):
     skill_name: str
     explanation: str
     grounded_facts: Dict[str, Any]
+
+
+class UserSignupRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+class UserLoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class UserResponse(BaseModel):
+    user_id: str
+    name: str
+    email: str
+    learner_id: str
+    token: str
+
+
+class RoadmapHistoryItem(BaseModel):
+    history_id: str
+    learner_id: str
+    target_role: str
+    target_role_id: str
+    created_at: str
+    updated_at: str
+    total_tasks: int
+    completed_tasks: int
+    progress_percentage: int
+    steps: List[RoadmapStep]
+    is_active: bool = False
+
+
+class ActivateHistoryRequest(BaseModel):
+    learner_id: str
+    history_id: str

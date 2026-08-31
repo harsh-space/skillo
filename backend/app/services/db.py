@@ -31,7 +31,8 @@ class DatabaseClient:
             "resources": {},
             "learners": {},
             "roadmaps": {},
-            "feedback_events": {}
+            "feedback_events": {},
+            "users": {}
         }
         self._load_local_db()
 

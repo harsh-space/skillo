@@ -120,3 +120,74 @@ export async function getStepExplanation(learner_id: string, step_id: string) {
   if (!res.ok) throw new Error("Failed to fetch explanation");
   return res.json();
 }
+
+export interface UserSession {
+  user_id: string;
+  name: string;
+  email: string;
+  learner_id: string;
+  token: string;
+}
+
+export async function signupUser(name: string, email: string, password: string): Promise<UserSession> {
+  const res = await fetch(`${API_BASE}/auth/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Failed to sign up. Please check your credentials.");
+  }
+  return res.json();
+}
+
+export async function loginUser(email: string, password: string): Promise<UserSession> {
+  const res = await fetch(`${API_BASE}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Invalid email or password.");
+  }
+  return res.json();
+}
+
+export interface RoadmapHistoryItem {
+  history_id: string;
+  learner_id: string;
+  target_role: string;
+  target_role_id: string;
+  created_at: string;
+  updated_at: string;
+  total_tasks: number;
+  completed_tasks: number;
+  progress_percentage: number;
+  steps: RoadmapStep[];
+  is_active: boolean;
+}
+
+export async function fetchHistory(learner_id: string): Promise<RoadmapHistoryItem[]> {
+  const res = await fetch(`${API_BASE}/history/${learner_id}`);
+  if (!res.ok) throw new Error("Failed to fetch roadmap history");
+  return res.json();
+}
+
+export async function activateHistoryRoadmap(learner_id: string, history_id: string): Promise<RoadmapData> {
+  const res = await fetch(`${API_BASE}/history/activate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ learner_id, history_id }),
+  });
+  if (!res.ok) throw new Error("Failed to switch roadmap");
+  return res.json();
+}
+
+export async function deleteHistoryItem(learner_id: string, history_id: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/history/${learner_id}/${history_id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("Failed to delete history item");
+}

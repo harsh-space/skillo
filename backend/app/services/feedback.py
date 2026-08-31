@@ -114,13 +114,24 @@ def handle_feedback(req: FeedbackRequest) -> FeedbackResponse:
         
         # Advance next step to in_progress
         if target_step_idx + 1 < len(steps):
-            steps[target_step_idx + 1].status = "in_progress"
+            if steps[target_step_idx + 1].status != "completed":
+                steps[target_step_idx + 1].status = "in_progress"
         
         # Look for dependent step to mark optionally skippable
         for next_step in steps[target_step_idx + 1:]:
             if curr_step.skill_name in next_step.prerequisites:
                 next_step.explanation += " (Fast-track candidate: master prerequisite scored >= 90%)"
                 break
+
+        # Update learner's mastered skills in DB profile
+        learner_doc = db.get_document("learners", req.learner_id)
+        if learner_doc:
+            current_skills = learner_doc.get("current_skills", [])
+            if curr_step.skill_name not in current_skills:
+                current_skills.append(curr_step.skill_name)
+                learner_doc["current_skills"] = current_skills
+                learner_doc["updated_at"] = datetime.now(timezone.utc).isoformat()
+                db.set_document("learners", req.learner_id, learner_doc)
 
     # RULE 3: Step completed
     elif req.event == "completed" or (req.event == "quiz_score" and req.value is not None and req.value >= 50):
@@ -133,23 +144,49 @@ def handle_feedback(req: FeedbackRequest) -> FeedbackResponse:
             if steps[target_step_idx + 1].status != "completed":
                 steps[target_step_idx + 1].status = "in_progress"
 
-        # Update learner's mastered skills in profile
+        # Update learner's mastered skills in DB profile
         learner_doc = db.get_document("learners", req.learner_id)
         if learner_doc:
             current_skills = learner_doc.get("current_skills", [])
             if curr_step.skill_name not in current_skills:
                 current_skills.append(curr_step.skill_name)
                 learner_doc["current_skills"] = current_skills
+                learner_doc["updated_at"] = datetime.now(timezone.utc).isoformat()
                 db.set_document("learners", req.learner_id, learner_doc)
 
     # Re-index step numbers
     for idx, s in enumerate(steps):
         s.step = idx + 1
 
-    # Persist updated roadmap
+    # Persist updated roadmap in database
     roadmap_doc["steps"] = [s.model_dump() for s in steps]
     roadmap_doc["updated_at"] = datetime.now(timezone.utc).isoformat()
     db.set_document("roadmaps", req.learner_id, roadmap_doc)
+
+    # Sync with roadmap history
+    target_role_id = roadmap_doc.get("target_role_id", "role_backend_developer")
+    target_role = roadmap_doc.get("target_role", "Software Engineer")
+    hist_id = f"hist_{req.learner_id}_{target_role_id}"
+    comp_count = sum(1 for s in steps if s.status == "completed")
+    total_count = len(steps)
+    pct = int((comp_count / total_count * 100)) if total_count > 0 else 0
+
+    existing_hist = db.get_document("roadmap_history", hist_id) or {}
+    history_record = {
+        "history_id": hist_id,
+        "learner_id": req.learner_id,
+        "target_role": target_role,
+        "target_role_id": target_role_id,
+        "created_at": existing_hist.get("created_at", roadmap_doc["updated_at"]),
+        "updated_at": roadmap_doc["updated_at"],
+        "total_tasks": total_count,
+        "completed_tasks": comp_count,
+        "progress_percentage": pct,
+        "steps": [s.model_dump() for s in steps],
+        "gap_summary": roadmap_doc.get("gap_summary", {}),
+        "is_active": True
+    }
+    db.set_document("roadmap_history", hist_id, history_record)
 
     return FeedbackResponse(
         learner_id=req.learner_id,

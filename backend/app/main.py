@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from app.api import profile, goal, recommend, feedback, explain, taxonomy
+from app.api import profile, goal, recommend, feedback, explain, taxonomy, auth
 from app.services.db import db
 from app.services.gap_analysis import get_embedding_model
 
@@ -51,6 +51,7 @@ app.add_middleware(
 
 # Include API Routers under /api/v1
 API_PREFIX = "/api/v1"
+app.include_router(auth.router, prefix=API_PREFIX)
 app.include_router(profile.router, prefix=API_PREFIX)
 app.include_router(goal.router, prefix=API_PREFIX)
 app.include_router(recommend.router, prefix=API_PREFIX)
