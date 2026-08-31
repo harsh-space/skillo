@@ -49,14 +49,18 @@ When you search for "how to become a backend developer" online, you get a flood 
 
 Skillo AI currently supports 6 career paths:
 
+<div align="center">
+
 | Career Path | What You'll Learn |
-|---|---|
+|:---:|:---|
 | **Frontend Developer** | HTML, CSS, JavaScript, TypeScript, React, Next.js |
 | **Backend Developer** | Python, SQL, REST APIs, Authentication, Docker |
 | **Full Stack Developer** | Both frontend and backend skills combined |
 | **Machine Learning Engineer** | Python, Data Analysis, ML algorithms, Deep Learning |
 | **AI Engineer** | Python, ML, Deep Learning, LLMs, Vector Databases |
 | **DevOps Engineer** | Linux, Git, Docker, Kubernetes, Cloud, CI/CD |
+
+</div>
 
 ---
 
