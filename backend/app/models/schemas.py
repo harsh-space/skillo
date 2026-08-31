@@ -100,3 +100,22 @@ class ExplanationResponse(BaseModel):
     skill_name: str
     explanation: str
     grounded_facts: Dict[str, Any]
+
+
+class UserSignupRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+class UserLoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class UserResponse(BaseModel):
+    user_id: str
+    name: str
+    email: str
+    learner_id: str
+    token: str

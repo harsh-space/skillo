@@ -120,3 +120,37 @@ export async function getStepExplanation(learner_id: string, step_id: string) {
   if (!res.ok) throw new Error("Failed to fetch explanation");
   return res.json();
 }
+
+export interface UserSession {
+  user_id: string;
+  name: string;
+  email: string;
+  learner_id: string;
+  token: string;
+}
+
+export async function signupUser(name: string, email: string, password: string): Promise<UserSession> {
+  const res = await fetch(`${API_BASE}/auth/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Failed to sign up. Please check your credentials.");
+  }
+  return res.json();
+}
+
+export async function loginUser(email: string, password: string): Promise<UserSession> {
+  const res = await fetch(`${API_BASE}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Invalid email or password.");
+  }
+  return res.json();
+}
