@@ -117,17 +117,40 @@ The application is structured into two decoupled tiers:
 - **Dashboard & Timeline**: Real-time progress indicators, milestone accordion cards, and collapsible flyouts for gap breakdown and mastered skills.
 - **Contextual Side Panels**: Non-intrusive explanation card and sliding multi-roadmap history drawer.
 
-<p align="center">
-  <img src="docs/career_ai_architecture_layers.png" width="650" alt="Skillo AI System Architecture Layers"/>
-  <br/>
-  <em>Figure 1: Modular system architecture and layer breakdown</em>
-</p>
+### Architecture & Telemetry Flow
 
-<p align="center">
-  <img src="docs/career_ai_backend_flow_architecture.png" width="650" alt="Skillo AI Backend Processing Flow"/>
-  <br/>
-  <em>Figure 2: End-to-end data processing and adaptive telemetry flow</em>
-</p>
+```mermaid
+flowchart TD
+    subgraph UI ["1. Presentation Layer (Next.js & Tailwind CSS)"]
+        A["Learner Input\n(Goal Text + Current Skills)"]
+        B["Interactive Dashboard\n(Roadmap Timeline & Progress)"]
+        C["Quiz Assessment\n(Pass / Fail / High Mastery)"]
+        H["History Drawer\n(Switch & Manage Paths)"]
+    end
+
+    subgraph API ["2. API & Security Layer (FastAPI)"]
+        Auth["Auth & Ownership Validation\n(Bcrypt Hashing + Bearer Token)"]
+        Endpoints["REST API Endpoints\n(/goal, /recommend, /feedback, /history)"]
+    end
+
+    subgraph Core ["3. Core Analytics & Graph Engine"]
+        NLP["Goal Parsing Engine\n(Character n-gram TF-IDF + Cosine Similarity)"]
+        Gap["Skill Gap Analyzer\n(Cosine Similarity, tau = 0.60)"]
+        DAG["DAG Path Generator\n(Prerequisite Closure & Topological Sort)"]
+        XAI["Explainable AI (XAI)\n(Fact-Grounded Graph Rationale)"]
+        Adapt["Adaptive Mutation Engine\n(Remedial Refresher / Skip Acceleration)"]
+    end
+
+    subgraph Storage ["4. Persistence & Storage Layer"]
+        DB[("Database Engine\n(Google Firestore / Local JSON Fallback)")]
+    end
+
+    A --> Auth --> Endpoints
+    Endpoints --> NLP --> Gap --> DAG --> XAI --> DB
+    DB --> B
+    C --> Endpoints --> Adapt --> DB
+    H --> Endpoints --> DB
+```
 
 ---
 
