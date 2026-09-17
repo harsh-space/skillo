@@ -1,0 +1,478 @@
+{
+  "version": "v1.1.0",
+  "timestamp": "2026-09-17T10:02:37Z",
+  "goal_classification": {
+    "total": 30,
+    "correct": 23,
+    "accuracy": 0.7667,
+    "p50_latency_ms": 4.64,
+    "p95_latency_ms": 9.67,
+    "results": [
+      {
+        "query": "I want to become a backend developer building APIs and servers",
+        "type": "clear",
+        "expected_role_id": "role_backend_developer",
+        "predicted_role_id": "role_backend_developer",
+        "status": "PASS",
+        "latency_ms": 2312.78
+      },
+      {
+        "query": "I want to learn database design, SQL, and FastAPI services",
+        "type": "clear",
+        "expected_role_id": "role_backend_developer",
+        "predicted_role_id": "role_backend_developer",
+        "status": "PASS",
+        "latency_ms": 6.61
+      },
+      {
+        "query": "I want to build REST services and write server-side Python code",
+        "type": "clear",
+        "expected_role_id": "role_backend_developer",
+        "predicted_role_id": "role_backend_developer",
+        "status": "PASS",
+        "latency_ms": 5.42
+      },
+      {
+        "query": "I want to develop backend systems with authentication and Docker deployments",
+        "type": "clear",
+        "expected_role_id": "role_backend_developer",
+        "predicted_role_id": "role_backend_developer",
+        "status": "PASS",
+        "latency_ms": 4.57
+      },
+      {
+        "query": "I want to become a frontend engineer with React and CSS",
+        "type": "clear",
+        "expected_role_id": "role_frontend_developer",
+        "predicted_role_id": "role_frontend_developer",
+        "status": "PASS",
+        "latency_ms": 3.96
+      },
+      {
+        "query": "I want to design responsive user interfaces and modern web applications",
+        "type": "clear",
+        "expected_role_id": "role_frontend_developer",
+        "predicted_role_id": "role_frontend_developer",
+        "status": "PASS",
+        "latency_ms": 4.51
+      },
+      {
+        "query": "I want to build beautiful websites using JavaScript, TypeScript, and Next.js",
+        "type": "clear",
+        "expected_role_id": "role_frontend_developer",
+        "predicted_role_id": "role_frontend_developer",
+        "status": "PASS",
+        "latency_ms": 4.47
+      },
+      {
+        "query": "I want to become an AI engineer building LLMs and RAG agents",
+        "type": "clear",
+        "expected_role_id": "role_ai_engineer",
+        "predicted_role_id": "role_ai_engineer",
+        "status": "PASS",
+        "latency_ms": 5.92
+      },
+      {
+        "query": "I want to build generative AI solutions and prompt pipelines",
+        "type": "clear",
+        "expected_role_id": "role_ai_engineer",
+        "predicted_role_id": "role_ai_engineer",
+        "status": "PASS",
+        "latency_ms": 5.16
+      },
+      {
+        "query": "I want to work with large language models and vector databases for AI applications",
+        "type": "clear",
+        "expected_role_id": "role_ai_engineer",
+        "predicted_role_id": "role_ai_engineer",
+        "status": "PASS",
+        "latency_ms": 9.67
+      },
+      {
+        "query": "I want to build machine learning models and train neural networks",
+        "type": "clear",
+        "expected_role_id": "role_ml_engineer",
+        "predicted_role_id": "role_ml_engineer",
+        "status": "PASS",
+        "latency_ms": 5.86
+      },
+      {
+        "query": "I want to work in data science, predictive modeling, and deep learning",
+        "type": "clear",
+        "expected_role_id": "role_ml_engineer",
+        "predicted_role_id": "role_ml_engineer",
+        "status": "PASS",
+        "latency_ms": 6.25
+      },
+      {
+        "query": "I want to become a devops engineer managing cloud and kubernetes",
+        "type": "clear",
+        "expected_role_id": "role_devops_engineer",
+        "predicted_role_id": "role_devops_engineer",
+        "status": "PASS",
+        "latency_ms": 4.7
+      },
+      {
+        "query": "I want to set up CI/CD pipelines, terraform infrastructure, and docker",
+        "type": "clear",
+        "expected_role_id": "role_devops_engineer",
+        "predicted_role_id": "role_devops_engineer",
+        "status": "PASS",
+        "latency_ms": 4.39
+      },
+      {
+        "query": "I want to be a fullstack developer creating complete end to end apps",
+        "type": "clear",
+        "expected_role_id": "role_fullstack_developer",
+        "predicted_role_id": "role_fullstack_developer",
+        "status": "PASS",
+        "latency_ms": 4.83
+      },
+      {
+        "query": "I want to master MERN stack and frontend plus backend development",
+        "type": "clear",
+        "expected_role_id": "role_fullstack_developer",
+        "predicted_role_id": "role_fullstack_developer",
+        "status": "PASS",
+        "latency_ms": 4.65
+      },
+      {
+        "query": "I want to code APIs",
+        "type": "short",
+        "expected_role_id": "role_backend_developer",
+        "predicted_role_id": "role_backend_developer",
+        "status": "PASS",
+        "latency_ms": 4.01
+      },
+      {
+        "query": "machine learning career",
+        "type": "short",
+        "expected_role_id": "role_ml_engineer",
+        "predicted_role_id": "role_ml_engineer",
+        "status": "PASS",
+        "latency_ms": 4.38
+      },
+      {
+        "query": "devops",
+        "type": "short",
+        "expected_role_id": "role_devops_engineer",
+        "predicted_role_id": "role_devops_engineer",
+        "status": "PASS",
+        "latency_ms": 4.82
+      },
+      {
+        "query": "AI and deep learning stuff",
+        "type": "short",
+        "expected_role_id": "role_ai_engineer",
+        "predicted_role_id": "role_ml_engineer",
+        "status": "FAIL",
+        "latency_ms": 4.63
+      },
+      {
+        "query": "fruntend develper with reeact and nexxt.js",
+        "type": "typo",
+        "expected_role_id": "role_frontend_developer",
+        "predicted_role_id": "role_backend_developer",
+        "status": "FAIL",
+        "latency_ms": 4.53
+      },
+      {
+        "query": "i wana do bacend develoment with python and apis",
+        "type": "typo",
+        "expected_role_id": "role_backend_developer",
+        "predicted_role_id": "role_backend_developer",
+        "status": "PASS",
+        "latency_ms": 4.25
+      },
+      {
+        "query": "mchine lerning engineerng",
+        "type": "typo",
+        "expected_role_id": "role_ml_engineer",
+        "predicted_role_id": "role_backend_developer",
+        "status": "FAIL",
+        "latency_ms": 5.07
+      },
+      {
+        "query": "I want to build web apps using containerization, microservices, and automation pipelines",
+        "type": "synonym",
+        "expected_role_id": "role_devops_engineer",
+        "predicted_role_id": "role_backend_developer",
+        "status": "FAIL",
+        "latency_ms": 4.53
+      },
+      {
+        "query": "I want to work with neural networks and statistical modeling",
+        "type": "synonym",
+        "expected_role_id": "role_ml_engineer",
+        "predicted_role_id": "role_backend_developer",
+        "status": "FAIL",
+        "latency_ms": 4.63
+      },
+      {
+        "query": "I want to build chatbots and intelligent agents using transformer models",
+        "type": "synonym",
+        "expected_role_id": "role_ai_engineer",
+        "predicted_role_id": "role_ai_engineer",
+        "status": "PASS",
+        "latency_ms": 4.5
+      },
+      {
+        "query": "I want to create component-based UIs with state management and routing",
+        "type": "synonym",
+        "expected_role_id": "role_frontend_developer",
+        "predicted_role_id": "role_backend_developer",
+        "status": "FAIL",
+        "latency_ms": 4.13
+      },
+      {
+        "query": "I know React, TypeScript, Node.js, Python, SQL, Docker, Kubernetes, TensorFlow, and LangChain and want to learn everything",
+        "type": "overspecified",
+        "expected_role_id": "role_fullstack_developer",
+        "predicted_role_id": "role_devops_engineer",
+        "status": "FAIL",
+        "latency_ms": 4.38
+      },
+      {
+        "query": "I have 5 years of Python experience and want to learn ML",
+        "type": "experience_context",
+        "expected_role_id": "role_ml_engineer",
+        "predicted_role_id": "role_ml_engineer",
+        "status": "PASS",
+        "latency_ms": 4.71
+      },
+      {
+        "query": "I am a junior developer wanting to transition into AI",
+        "type": "experience_context",
+        "expected_role_id": "role_ai_engineer",
+        "predicted_role_id": "role_ai_engineer",
+        "status": "PASS",
+        "latency_ms": 5.21
+      }
+    ]
+  },
+  "skill_gap_analysis": {
+    "total_binary_cases": 14,
+    "tp": 6,
+    "fp": 0,
+    "tn": 4,
+    "fn": 4,
+    "precision": 1.0,
+    "recall": 0.6,
+    "f1": 0.75,
+    "p50_latency_ms": 7.44,
+    "p95_latency_ms": 23.5,
+    "results": [
+      {
+        "required_skill": "Python (advanced)",
+        "learner_skill": "Python (advanced)",
+        "expected": "MATCH",
+        "predicted": "MATCH",
+        "similarity_score": 1.0,
+        "status": "PASS",
+        "latency_ms": 23.5
+      },
+      {
+        "required_skill": "Python (advanced)",
+        "learner_skill": "Python (basic)",
+        "expected": "GAP",
+        "predicted": "GAP",
+        "similarity_score": 0.213,
+        "status": "PASS",
+        "latency_ms": 6.86
+      },
+      {
+        "required_skill": "SQL & Relational Databases",
+        "learner_skill": "SQL & Relational Databases",
+        "expected": "MATCH",
+        "predicted": "MATCH",
+        "similarity_score": 1.0,
+        "status": "PASS",
+        "latency_ms": 7.74
+      },
+      {
+        "required_skill": "REST APIs",
+        "learner_skill": "REST APIs",
+        "expected": "MATCH",
+        "predicted": "MATCH",
+        "similarity_score": 1.0,
+        "status": "PASS",
+        "latency_ms": 8.16
+      },
+      {
+        "required_skill": "Docker & Containers",
+        "learner_skill": "Docker & Containers",
+        "expected": "MATCH",
+        "predicted": "MATCH",
+        "similarity_score": 1.0,
+        "status": "PASS",
+        "latency_ms": 8.33
+      },
+      {
+        "required_skill": "Machine Learning Fundamentals",
+        "learner_skill": "Python (advanced)",
+        "expected": "GAP",
+        "predicted": "GAP",
+        "similarity_score": 0.0,
+        "status": "PASS",
+        "latency_ms": 6.62
+      },
+      {
+        "required_skill": "Machine Learning Fundamentals",
+        "learner_skill": "Machine Learning Fundamentals",
+        "expected": "MATCH",
+        "predicted": "GAP",
+        "similarity_score": 0.0,
+        "status": "FAIL",
+        "latency_ms": 9.53
+      },
+      {
+        "required_skill": "LLM Applications & RAG Systems",
+        "learner_skill": "LLM Applications & RAG Systems",
+        "expected": "MATCH",
+        "predicted": "GAP",
+        "similarity_score": 0.0,
+        "status": "FAIL",
+        "latency_ms": 7.14
+      },
+      {
+        "required_skill": "Git & GitHub",
+        "learner_skill": "Git & GitHub",
+        "expected": "MATCH",
+        "predicted": "MATCH",
+        "similarity_score": 1.0,
+        "status": "PASS",
+        "latency_ms": 6.9
+      },
+      {
+        "required_skill": "TypeScript",
+        "learner_skill": "TypeScript",
+        "expected": "MATCH",
+        "predicted": "GAP",
+        "similarity_score": 0.0,
+        "status": "FAIL",
+        "latency_ms": 6.62
+      },
+      {
+        "required_skill": "Authentication & JWT",
+        "learner_skill": "Authentication & JWT",
+        "expected": "MATCH",
+        "predicted": "MATCH",
+        "similarity_score": 1.0,
+        "status": "PASS",
+        "latency_ms": 6.65
+      },
+      {
+        "required_skill": "HTML",
+        "learner_skill": "CSS",
+        "expected": "GAP",
+        "predicted": "GAP",
+        "similarity_score": 0.0,
+        "status": "PASS",
+        "latency_ms": 5.88
+      },
+      {
+        "required_skill": "Kubernetes",
+        "learner_skill": "Kubernetes",
+        "expected": "MATCH",
+        "predicted": "GAP",
+        "similarity_score": 0.0,
+        "status": "FAIL",
+        "latency_ms": 8.12
+      },
+      {
+        "required_skill": "Vector Databases & Embeddings",
+        "learner_skill": "SQL & Relational Databases",
+        "expected": "GAP",
+        "predicted": "GAP",
+        "similarity_score": 0.0,
+        "status": "PASS",
+        "latency_ms": 8.27
+      }
+    ]
+  },
+  "roadmap_invariants": {
+    "total_violations": 0,
+    "p50_latency_ms": 6.99,
+    "p95_latency_ms": 8.82,
+    "role_results": [
+      {
+        "role_id": "role_backend_developer",
+        "role_name": "Backend Developer",
+        "total_steps": 9,
+        "latency_ms": 8.82,
+        "violations": {
+          "duplicates": [],
+          "prerequisite_order_violations": [],
+          "missing_skill_ids": [],
+          "missing_resources": []
+        },
+        "pass": true
+      },
+      {
+        "role_id": "role_frontend_developer",
+        "role_name": "Frontend Developer",
+        "total_steps": 10,
+        "latency_ms": 6.11,
+        "violations": {
+          "duplicates": [],
+          "prerequisite_order_violations": [],
+          "missing_skill_ids": [],
+          "missing_resources": []
+        },
+        "pass": true
+      },
+      {
+        "role_id": "role_fullstack_developer",
+        "role_name": "Full Stack Developer",
+        "total_steps": 14,
+        "latency_ms": 7.13,
+        "violations": {
+          "duplicates": [],
+          "prerequisite_order_violations": [],
+          "missing_skill_ids": [],
+          "missing_resources": []
+        },
+        "pass": true
+      },
+      {
+        "role_id": "role_devops_engineer",
+        "role_name": "DevOps Engineer",
+        "total_steps": 7,
+        "latency_ms": 6.86,
+        "violations": {
+          "duplicates": [],
+          "prerequisite_order_violations": [],
+          "missing_skill_ids": [],
+          "missing_resources": []
+        },
+        "pass": true
+      },
+      {
+        "role_id": "role_ml_engineer",
+        "role_name": "Machine Learning Engineer",
+        "total_steps": 8,
+        "latency_ms": 6.8,
+        "violations": {
+          "duplicates": [],
+          "prerequisite_order_violations": [],
+          "missing_skill_ids": [],
+          "missing_resources": []
+        },
+        "pass": true
+      },
+      {
+        "role_id": "role_ai_engineer",
+        "role_name": "AI Engineer",
+        "total_steps": 9,
+        "latency_ms": 7.62,
+        "violations": {
+          "duplicates": [],
+          "prerequisite_order_violations": [],
+          "missing_skill_ids": [],
+          "missing_resources": []
+        },
+        "pass": true
+      }
+    ]
+  }
+}

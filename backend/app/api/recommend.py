@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Optional
 from app.models.schemas import (
     RecommendRequest,
     RoadmapResponse,
@@ -13,24 +13,22 @@ from app.services.db import db
 from app.services.gap_analysis import run_gap_analysis
 from app.services.path_generator import generate_learning_path
 from app.services.xai import _template_grounded_explanation
+from app.api.auth import verify_learner_ownership
 
 router = APIRouter(tags=["Recommendation"])
 
 
 @router.post("/recommend", response_model=RoadmapResponse)
-def generate_recommendation(req: RecommendRequest):
+def generate_recommendation(req: RecommendRequest, authorization: Optional[str] = Header(None)):
+    verify_learner_ownership(req.learner_id, authorization)
+
     # 1. Load learner profile
     learner_doc = db.get_document("learners", req.learner_id)
     if not learner_doc:
-        learner_doc = {
-            "learner_id": req.learner_id,
-            "name": "Learner",
-            "current_skills": [],
-            "target_role_id": "role_backend_developer",
-            "created_at": datetime.now(timezone.utc).isoformat(),
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        }
-        db.set_document("learners", req.learner_id, learner_doc)
+        raise HTTPException(
+            status_code=404,
+            detail=f"Learner profile '{req.learner_id}' not found. Please create profile first."
+        )
 
     target_role_id = learner_doc.get("target_role_id") or "role_backend_developer"
     current_skills = learner_doc.get("current_skills", [])
@@ -131,49 +129,41 @@ def generate_recommendation(req: RecommendRequest):
 
 
 @router.get("/roadmap/{learner_id}", response_model=RoadmapResponse)
-def get_learner_roadmap(learner_id: str, regenerate: bool = False):
+def get_learner_roadmap(learner_id: str, regenerate: bool = False, authorization: Optional[str] = Header(None)):
+    verify_learner_ownership(learner_id, authorization)
+
+    learner_doc = db.get_document("learners", learner_id)
+    if not learner_doc:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Learner profile '{learner_id}' not found."
+        )
+
     if regenerate:
-        return generate_recommendation(RecommendRequest(learner_id=learner_id))
+        return generate_recommendation(RecommendRequest(learner_id=learner_id), authorization=authorization)
 
     doc = db.get_document("roadmaps", learner_id)
     if not doc:
-        # Generate automatically if not exists
-        return generate_recommendation(RecommendRequest(learner_id=learner_id))
+        raise HTTPException(
+            status_code=404,
+            detail=f"No active roadmap found for learner '{learner_id}'."
+        )
 
     return RoadmapResponse(**doc)
 
 
 @router.get("/history/{learner_id}", response_model=List[RoadmapHistoryItem])
-def get_learner_history(learner_id: str):
+def get_learner_history(learner_id: str, authorization: Optional[str] = Header(None)):
     """Retrieves all past and active roadmap sessions for this learner."""
+    verify_learner_ownership(learner_id, authorization)
+
+    learner_doc = db.get_document("learners", learner_id)
+    if not learner_doc:
+        raise HTTPException(status_code=404, detail=f"Learner profile '{learner_id}' not found.")
+
     all_hist = db.query_documents("roadmap_history", "learner_id", learner_id)
-    
     active_rm = db.get_document("roadmaps", learner_id)
     active_role_id = active_rm.get("target_role_id") if active_rm else None
-
-    # Fallback: if history empty but active roadmap exists, seed history item
-    if not all_hist and active_rm and active_rm.get("steps"):
-        steps_list = active_rm.get("steps", [])
-        comp_count = sum(1 for s in steps_list if s.get("status") == "completed")
-        total_count = len(steps_list)
-        pct = int((comp_count / total_count * 100)) if total_count > 0 else 0
-        hist_id = f"hist_{learner_id}_{active_rm.get('target_role_id', 'default')}"
-        
-        seeded_hist = {
-            "history_id": hist_id,
-            "learner_id": learner_id,
-            "target_role": active_rm.get("target_role", "Software Engineer"),
-            "target_role_id": active_rm.get("target_role_id", "role_backend_developer"),
-            "created_at": active_rm.get("updated_at", datetime.now(timezone.utc).isoformat()),
-            "updated_at": active_rm.get("updated_at", datetime.now(timezone.utc).isoformat()),
-            "total_tasks": total_count,
-            "completed_tasks": comp_count,
-            "progress_percentage": pct,
-            "steps": steps_list,
-            "is_active": True
-        }
-        db.set_document("roadmap_history", hist_id, seeded_hist)
-        all_hist = [seeded_hist]
 
     # Convert to schema items and mark active
     result: List[RoadmapHistoryItem] = []
@@ -207,8 +197,10 @@ def get_learner_history(learner_id: str):
 
 
 @router.post("/history/activate", response_model=RoadmapResponse)
-def activate_history_roadmap(req: ActivateHistoryRequest):
+def activate_history_roadmap(req: ActivateHistoryRequest, authorization: Optional[str] = Header(None)):
     """Switches the learner's active roadmap to a selected historical roadmap."""
+    verify_learner_ownership(req.learner_id, authorization)
+
     hist_doc = db.get_document("roadmap_history", req.history_id)
     if not hist_doc or hist_doc.get("learner_id") != req.learner_id:
         raise HTTPException(status_code=404, detail="Roadmap history record not found.")
@@ -249,11 +241,51 @@ def activate_history_roadmap(req: ActivateHistoryRequest):
 
 
 @router.delete("/history/{learner_id}/{history_id}")
-def delete_history_item(learner_id: str, history_id: str):
+def delete_history_item(learner_id: str, history_id: str, authorization: Optional[str] = Header(None)):
     """Deletes an archived roadmap from history."""
+    verify_learner_ownership(learner_id, authorization)
+
     hist_doc = db.get_document("roadmap_history", history_id)
-    if hist_doc and hist_doc.get("learner_id") == learner_id:
-        db.delete_document("roadmap_history", history_id)
-        return {"status": "success", "message": "History item removed."}
-    raise HTTPException(status_code=404, detail="History item not found.")
+    if not hist_doc or hist_doc.get("learner_id") != learner_id:
+        raise HTTPException(status_code=404, detail="History item not found.")
+
+    deleted_target_role_id = hist_doc.get("target_role_id")
+    db.delete_document("roadmap_history", history_id)
+
+    # Check remaining history items for this learner
+    remaining = db.query_documents("roadmap_history", "learner_id", learner_id)
+    active_rm = db.get_document("roadmaps", learner_id)
+
+    if not remaining:
+        # No roadmaps left in history: completely clear active roadmap and learner target
+        if active_rm:
+            db.delete_document("roadmaps", learner_id)
+        learner_doc = db.get_document("learners", learner_id)
+        if learner_doc and "target_role_id" in learner_doc:
+            learner_doc["target_role_id"] = None
+            learner_doc["updated_at"] = datetime.now(timezone.utc).isoformat()
+            db.set_document("learners", learner_id, learner_doc)
+    else:
+        # If the deleted roadmap was the currently active one, switch active to the latest remaining
+        if active_rm and active_rm.get("target_role_id") == deleted_target_role_id:
+            remaining.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
+            next_active = remaining[0]
+            new_active_record = {
+                "learner_id": learner_id,
+                "target_role": next_active.get("target_role", "Software Engineer"),
+                "target_role_id": next_active.get("target_role_id", "role_backend_developer"),
+                "steps": next_active.get("steps", []),
+                "gap_summary": next_active.get("gap_summary", {"missing_skills": [], "matched_skills": []}),
+                "updated_at": next_active.get("updated_at", datetime.now(timezone.utc).isoformat())
+            }
+            db.set_document("roadmaps", learner_id, new_active_record)
+
+            learner_doc = db.get_document("learners", learner_id)
+            if learner_doc:
+                learner_doc["target_role_id"] = next_active.get("target_role_id")
+                learner_doc["updated_at"] = datetime.now(timezone.utc).isoformat()
+                db.set_document("learners", learner_id, learner_doc)
+
+    return {"status": "success", "message": "History item removed."}
+
 

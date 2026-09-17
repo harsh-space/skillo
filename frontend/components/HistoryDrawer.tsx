@@ -120,16 +120,28 @@ export default function HistoryDrawer({
     }
   };
 
-  const handleDelete = async (e: React.MouseEvent, historyId: string) => {
+  const handleDelete = async (e: React.MouseEvent, historyId: string, isActive: boolean = false) => {
     e.stopPropagation();
     const targetId = getEffectiveLearnerId();
     try {
       await deleteHistoryItem(targetId, historyId);
-      setHistoryItems((prev) => prev.filter((h) => h.history_id !== historyId));
+      const remaining = historyItems.filter((h) => h.history_id !== historyId);
+      setHistoryItems(remaining);
+      if (remaining.length === 0) {
+        onNewRoadmap();
+      } else if (isActive) {
+        handleItemClick(remaining[0]);
+      }
     } catch (err) {
       console.error('Failed to delete history item:', err);
       // Optimistic removal
-      setHistoryItems((prev) => prev.filter((h) => h.history_id !== historyId));
+      const remaining = historyItems.filter((h) => h.history_id !== historyId);
+      setHistoryItems(remaining);
+      if (remaining.length === 0) {
+        onNewRoadmap();
+      } else if (isActive) {
+        handleItemClick(remaining[0]);
+      }
     }
   };
 
@@ -200,12 +212,23 @@ export default function HistoryDrawer({
               <p className="text-xs text-slate-400">Loading roadmaps...</p>
             </div>
           ) : historyItems.length === 0 ? (
-            <div className="py-12 text-center space-y-2 px-3">
+            <div className="py-12 text-center space-y-3 px-3">
               <MessageSquare className="w-8 h-8 text-slate-600 mx-auto" />
-              <h4 className="text-xs font-bold text-slate-300">No Roadmaps Yet</h4>
+              <h4 className="text-xs font-bold text-slate-300">No Roadmaps Left</h4>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Click "+ New Career Roadmap" to create your first learning path.
+                All previous roadmaps have been removed. Click below to start a new learning path.
               </p>
+              <button
+                type="button"
+                onClick={() => {
+                  onNewRoadmap();
+                  onClose();
+                }}
+                className="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-indigo-950/30 transition-all cursor-pointer mt-2"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>+ New Career Roadmap</span>
+              </button>
             </div>
           ) : (
             historyItems.map((item) => {
@@ -266,16 +289,14 @@ export default function HistoryDrawer({
 
                   {/* Actions on hover */}
                   <div className="flex items-center gap-1">
-                    {!item.is_active && (
-                      <button
-                        type="button"
-                        onClick={(e) => handleDelete(e, item.history_id)}
-                        title="Delete roadmap"
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition-all"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => handleDelete(e, item.history_id, !!item.is_active)}
+                      title="Delete roadmap"
+                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition-all cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                     <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 transition-colors" />
                   </div>
                 </div>

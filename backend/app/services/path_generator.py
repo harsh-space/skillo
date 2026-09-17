@@ -74,9 +74,10 @@ def generate_learning_path(
     # Topological sort over the DAG
     try:
         ordered_skill_ids = list(nx.topological_sort(subgraph))
-    except nx.NetworkXUnfeasible:
-        # Fallback if a cycle were introduced
-        ordered_skill_ids = list(required_closure)
+    except nx.NetworkXUnfeasible as e:
+        import logging
+        logging.getLogger(__name__).error("[PathGenerator] CYCLE DETECTED in prerequisite DAG subgraph: %s", e)
+        raise
 
     # Group resources by skill_id
     resources_by_skill: Dict[str, List[Dict[str, Any]]] = {}

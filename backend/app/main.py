@@ -1,4 +1,11 @@
 import os
+import sys
+
+# Ensure backend directory is in sys.path so 'app' can be imported anywhere
+_backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+
 from dotenv import load_dotenv
 
 # Load .env from repo root (two levels up from backend/app/)
@@ -32,11 +39,14 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS configuration for cross-domain frontend (Vercel & local)
+# CORS configuration for cross-domain frontend (Vercel & local dev)
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000,https://skillo-ai.vercel.app")
+ALLOWED_ORIGINS = [origin.strip() for origin in _raw_origins.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

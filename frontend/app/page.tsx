@@ -204,7 +204,11 @@ export default function Home() {
         onClose={() => setIsHistoryOpen(false)}
         learnerId={session?.learner_id}
         onSelectRoadmap={handleSelectHistoryRoadmap}
-        onNewRoadmap={() => setCurrentStep('onboarding')}
+        onNewRoadmap={() => {
+          setActiveRoadmapData(null);
+          setLearnerData(null);
+          setCurrentStep('onboarding');
+        }}
       />
     </main>
   );

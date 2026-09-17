@@ -18,9 +18,9 @@ def _get_taxonomy_context():
 
 def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: List[Dict[str, Any]]) -> GoalParseResponse:
     """
-    Pure ML semantic intent extraction using dense sentence-transformer embeddings.
-    Embeds the entire free-text query into a 384-dimensional dense vector space and computes
-    cosine similarity against rich contextual role representations (role descriptions + skill clusters).
+    ML semantic intent extraction using character n-gram TF-IDF vectorization.
+    Extracts text features and computes cosine similarity against rich contextual role
+    representations (role descriptions + skill clusters) with alias boosts.
     """
     model = get_embedding_model()
     skill_map = {s["skill_id"]: s["name"] for s in skills}
@@ -29,7 +29,7 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
     alias_map = {
         "role_ml_engineer": ["ml", "machine learning", "deep learning", "predictive model", "data science", "pytorch", "tensorflow"],
         "role_ai_engineer": ["ai", "artificial intelligence", "genai", "generative ai", "llm", "rag", "agents", "langchain", "prompt engineering"],
-        "role_frontend_developer": ["frontend", "front-end", "front end", "ui", "ux", "react", "nextjs", "next.js", "css", "html", "javascript", "client-side"],
+        "role_frontend_developer": ["frontend", "front-end", "front end", "ui", "ux", "ui/ux", "user interface", "user interfaces", "responsive", "react", "nextjs", "next.js", "css", "html", "javascript", "client-side"],
         "role_backend_developer": ["backend", "back-end", "back end", "server", "fastapi", "django", "flask", "database", "sql", "orm", "rest api", "microservices"],
         "role_devops_engineer": ["devops", "sre", "cloud", "infrastructure", "kubernetes", "k8s", "docker", "ci/cd", "pipeline", "aws", "terraform"],
         "role_fullstack_developer": ["fullstack", "full stack", "full-stack", "mern", "end to end", "end-to-end"]
@@ -61,34 +61,47 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
                     role_vector = model.encode(role_semantic_text)
                 sim = _compute_cosine_similarity(goal_vector, role_vector)
                 
+                matched_role_specific = False
                 # Check exact title or keyword alias matches
                 if r["name"].lower() in goal_lower:
                     sim += 0.40
+                    matched_role_specific = True
                 
                 # Alias matching boost
                 aliases = alias_map.get(r_id, [])
                 for alias in aliases:
-                    if alias in goal_lower:
-                        sim += 0.35
-                    elif alias in goal_words:
-                        sim += 0.35
+                    if " " in alias or "-" in alias or "/" in alias:
+                        if alias in goal_lower:
+                            sim += 0.35
+                            matched_role_specific = True
+                    else:
+                        if alias in goal_words:
+                            sim += 0.35
+                            matched_role_specific = True
+                
+                # Clamp similarity score to at most 1.0
+                sim = min(sim, 1.0)
+
+                # Discard low-confidence subword background noise if no specific keywords matched
+                if not matched_role_specific and sim < 0.45:
+                    sim = 0.0
                 
                 if sim > best_sim:
                     best_sim = sim
                     best_role = r
                     
-            if best_role:
+            if best_role and best_sim > 0.0:
                 target_skill_names = [skill_map.get(s_id, s_id) for s_id in best_role.get("required_skills", [])]
                 return GoalParseResponse(
                     target_role=best_role["name"],
                     target_role_id=best_role["role_id"],
                     target_skills=target_skill_names,
-                    parsed_intent=f"Extracted career objective: {best_role['name']} (Dense Semantic Cosine Similarity: {best_sim:.2f})"
+                    parsed_intent=f"Extracted career objective: {best_role['name']} (TF-IDF Cosine Similarity: {best_sim:.2f})"
                 )
         except Exception as e:
             print(f"[GoalParser Warning] Semantic embedding parse failed: {e}. Using token fallback.")
 
-    # Token fallback if model is unavailable
+    # Token fallback if model is unavailable or best_sim <= 0.0
     best_role = None
     best_score = -1
 
@@ -101,8 +114,12 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
         
         # Check alias
         for alias in alias_map.get(r_id, []):
-            if alias in goal_lower or alias in goal_words:
-                score += 4
+            if " " in alias or "-" in alias or "/" in alias:
+                if alias in goal_lower:
+                    score += 4
+            else:
+                if alias in goal_words:
+                    score += 4
 
         if score > best_score:
             best_score = score
@@ -110,6 +127,13 @@ def _semantic_embed_parse(goal_text: str, roles: List[Dict[str, Any]], skills: L
 
     if not best_role or best_score <= 0:
         best_role = next((r for r in roles if "backend" in r["name"].lower()), roles[0])
+        target_skill_names = [skill_map.get(s_id, s_id) for s_id in best_role.get("required_skills", [])]
+        return GoalParseResponse(
+            target_role=best_role["name"],
+            target_role_id=best_role["role_id"],
+            target_skills=target_skill_names,
+            parsed_intent=f"Extracted career objective: {best_role['name']} (low confidence — goal did not match any known role)"
+        )
 
     target_skill_names = [skill_map.get(s_id, s_id) for s_id in best_role.get("required_skills", [])]
     return GoalParseResponse(
@@ -218,6 +242,8 @@ async def parse_goal(goal_text: str) -> GoalParseResponse:
     """
     Parses a free-text learning goal into a structured target_role + target_skills,
     constrained to the curated taxonomy.
+    Primary path: Character n-gram TF-IDF vector matching with alias boosts.
+    Fallback path: LLM classification (Gemini / OpenAI) if primary parsing is unavailable.
     """
     roles, skills = _get_taxonomy_context()
 
