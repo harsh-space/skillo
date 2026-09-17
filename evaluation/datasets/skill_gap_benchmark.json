@@ -1,0 +1,170 @@
+[
+  {
+    "required_skill": "Python (advanced)",
+    "required_skill_id": "skill_python_advanced",
+    "learner_skill": "Python (advanced)",
+    "expected_relationship": "MATCH",
+    "note": "Exact match"
+  },
+  {
+    "required_skill": "Python (advanced)",
+    "required_skill_id": "skill_python_advanced",
+    "learner_skill": "Python (basic)",
+    "expected_relationship": "GAP",
+    "note": "Level distinction — basic should NOT satisfy advanced requirement"
+  },
+  {
+    "required_skill": "SQL & Relational Databases",
+    "required_skill_id": "skill_sql",
+    "learner_skill": "SQL & Relational Databases",
+    "expected_relationship": "MATCH",
+    "note": "Exact match"
+  },
+  {
+    "required_skill": "SQL & Relational Databases",
+    "required_skill_id": "skill_sql",
+    "learner_skill": "PostgreSQL",
+    "expected_relationship": "PARTIAL_MATCH",
+    "note": "PostgreSQL is a specific implementation of SQL — should ideally score close to threshold"
+  },
+  {
+    "required_skill": "REST APIs",
+    "required_skill_id": "skill_rest_apis",
+    "learner_skill": "FastAPI",
+    "expected_relationship": "PARTIAL_MATCH",
+    "note": "FastAPI is a tool for building REST APIs — related but not the same"
+  },
+  {
+    "required_skill": "REST APIs",
+    "required_skill_id": "skill_rest_apis",
+    "learner_skill": "REST APIs",
+    "expected_relationship": "MATCH",
+    "note": "Exact match"
+  },
+  {
+    "required_skill": "React",
+    "required_skill_id": "skill_react",
+    "learner_skill": "JavaScript",
+    "expected_relationship": "PARTIAL_MATCH",
+    "note": "JavaScript is foundational to React but does not satisfy a React requirement"
+  },
+  {
+    "required_skill": "Docker & Containers",
+    "required_skill_id": "skill_docker",
+    "learner_skill": "Kubernetes",
+    "expected_relationship": "PARTIAL_MATCH",
+    "note": "Related container technologies — Kubernetes depends on Docker concepts"
+  },
+  {
+    "required_skill": "Docker & Containers",
+    "required_skill_id": "skill_docker",
+    "learner_skill": "Docker & Containers",
+    "expected_relationship": "MATCH",
+    "note": "Exact match"
+  },
+  {
+    "required_skill": "Machine Learning Fundamentals",
+    "required_skill_id": "skill_ml_basics",
+    "learner_skill": "Python (advanced)",
+    "expected_relationship": "GAP",
+    "note": "Python is a prerequisite for ML but does not satisfy the ML skill itself"
+  },
+  {
+    "required_skill": "Machine Learning Fundamentals",
+    "required_skill_id": "skill_ml_basics",
+    "learner_skill": "Machine Learning Fundamentals",
+    "expected_relationship": "MATCH",
+    "note": "Exact match"
+  },
+  {
+    "required_skill": "LLM Applications & RAG Systems",
+    "required_skill_id": "skill_llm_rag",
+    "learner_skill": "LLM Applications & RAG Systems",
+    "expected_relationship": "MATCH",
+    "note": "Exact match"
+  },
+  {
+    "required_skill": "LLM Applications & RAG Systems",
+    "required_skill_id": "skill_llm_rag",
+    "learner_skill": "Deep Learning & PyTorch",
+    "expected_relationship": "PARTIAL_MATCH",
+    "note": "Deep learning is a component of LLM development but not the same thing"
+  },
+  {
+    "required_skill": "Git & GitHub",
+    "required_skill_id": "skill_git",
+    "learner_skill": "Git & GitHub",
+    "expected_relationship": "MATCH",
+    "note": "Exact match"
+  },
+  {
+    "required_skill": "Git & GitHub",
+    "required_skill_id": "skill_git",
+    "learner_skill": "CI/CD Pipelines",
+    "expected_relationship": "PARTIAL_MATCH",
+    "note": "CI/CD uses Git but is a broader DevOps concept"
+  },
+  {
+    "required_skill": "TypeScript",
+    "required_skill_id": "skill_typescript",
+    "learner_skill": "JavaScript",
+    "expected_relationship": "PARTIAL_MATCH",
+    "note": "TypeScript is a superset of JavaScript — JS knowledge is related but insufficient"
+  },
+  {
+    "required_skill": "TypeScript",
+    "required_skill_id": "skill_typescript",
+    "learner_skill": "TypeScript",
+    "expected_relationship": "MATCH",
+    "note": "Exact match"
+  },
+  {
+    "required_skill": "Authentication & JWT",
+    "required_skill_id": "skill_auth",
+    "learner_skill": "REST APIs",
+    "expected_relationship": "PARTIAL_MATCH",
+    "note": "Auth is implemented via REST APIs but they are distinct skills"
+  },
+  {
+    "required_skill": "Authentication & JWT",
+    "required_skill_id": "skill_auth",
+    "learner_skill": "Authentication & JWT",
+    "expected_relationship": "MATCH",
+    "note": "Exact match"
+  },
+  {
+    "required_skill": "HTML",
+    "required_skill_id": "skill_html",
+    "learner_skill": "CSS",
+    "expected_relationship": "GAP",
+    "note": "HTML and CSS are frequently co-taught but are distinct skills"
+  },
+  {
+    "required_skill": "Kubernetes",
+    "required_skill_id": "skill_kubernetes",
+    "learner_skill": "Docker & Containers",
+    "expected_relationship": "PARTIAL_MATCH",
+    "note": "Docker is a prerequisite for Kubernetes but does not satisfy the Kubernetes requirement"
+  },
+  {
+    "required_skill": "Kubernetes",
+    "required_skill_id": "skill_kubernetes",
+    "learner_skill": "Kubernetes",
+    "expected_relationship": "MATCH",
+    "note": "Exact match"
+  },
+  {
+    "required_skill": "Data Analysis & Pandas",
+    "required_skill_id": "skill_data_analysis",
+    "learner_skill": "Python (advanced)",
+    "expected_relationship": "PARTIAL_MATCH",
+    "note": "Python is used for data analysis but Pandas is a separate skill"
+  },
+  {
+    "required_skill": "Vector Databases & Embeddings",
+    "required_skill_id": "skill_vector_dbs",
+    "learner_skill": "SQL & Relational Databases",
+    "expected_relationship": "GAP",
+    "note": "SQL and vector DBs are fundamentally different paradigms"
+  }
+]

@@ -1,0 +1,153 @@
+[
+  {
+    "query": "I want to work with cloud and backend systems",
+    "expected_role_ids": ["role_backend_developer", "role_devops_engineer"],
+    "type": "ambiguous_two_roles",
+    "note": "Cloud implies DevOps; backend implies Backend Developer. System must pick one — both are defensible."
+  },
+  {
+    "query": "I want to build AI-powered web applications with APIs",
+    "expected_role_ids": ["role_backend_developer", "role_ai_engineer", "role_fullstack_developer"],
+    "type": "ambiguous_three_roles",
+    "note": "AI-powered (AI Engineer) + web apps (Full Stack) + APIs (Backend). True multi-domain intent."
+  },
+  {
+    "query": "I want to do both frontend and backend but also machine learning",
+    "expected_role_ids": ["role_fullstack_developer", "role_ml_engineer"],
+    "type": "ambiguous_multi",
+    "note": "Explicitly states multiple domains. System cannot satisfy all at once."
+  },
+  {
+    "query": "I want to use FastAPI to build microservices deployed on AWS with Kubernetes",
+    "expected_role_ids": ["role_backend_developer", "role_devops_engineer"],
+    "type": "ambiguous_two_roles",
+    "note": "FastAPI (Backend) + AWS + Kubernetes (DevOps)."
+  },
+  {
+    "query": "I want to work in cybersecurity and ethical hacking",
+    "expected_role_id": null,
+    "type": "out_of_scope",
+    "note": "Cybersecurity is not a supported career path."
+  },
+  {
+    "query": "I want to become a data engineer building ETL pipelines and Kafka streams",
+    "expected_role_id": null,
+    "type": "out_of_scope",
+    "note": "Data Engineering is not in the v1.1 taxonomy."
+  },
+  {
+    "query": "I want to develop mobile apps for iOS using Swift",
+    "expected_role_id": null,
+    "type": "out_of_scope",
+    "note": "Mobile development is not supported."
+  },
+  {
+    "query": "I want to become a blockchain developer",
+    "expected_role_id": null,
+    "type": "out_of_scope",
+    "note": "Blockchain is not in the v1.1 taxonomy."
+  },
+  {
+    "query": "fruntend develper with reeact and nexxt.js",
+    "expected_role_id": "role_frontend_developer",
+    "type": "typo",
+    "note": "Multiple spelling errors — character n-gram should handle these due to char-level features."
+  },
+  {
+    "query": "i wana do bacend develoment with python and apis",
+    "expected_role_id": "role_backend_developer",
+    "type": "typo",
+    "note": "Heavily misspelled backend developer query."
+  },
+  {
+    "query": "mchine lerning engneer",
+    "expected_role_id": "role_ml_engineer",
+    "type": "typo",
+    "note": "Severely misspelled machine learning engineer."
+  },
+  {
+    "query": "I want to code APIs",
+    "expected_role_id": "role_backend_developer",
+    "type": "short",
+    "note": "Very short, minimal context. One keyword."
+  },
+  {
+    "query": "machine learning career",
+    "expected_role_id": "role_ml_engineer",
+    "type": "short",
+    "note": "Two-word query."
+  },
+  {
+    "query": "devops",
+    "expected_role_id": "role_devops_engineer",
+    "type": "short",
+    "note": "Single-word query."
+  },
+  {
+    "query": "?",
+    "expected_role_id": null,
+    "type": "nonsensical",
+    "note": "Single punctuation mark — should return low confidence, not a valid role."
+  },
+  {
+    "query": "asdfghjkl",
+    "expected_role_id": null,
+    "type": "nonsensical",
+    "note": "Random characters — should return low confidence."
+  },
+  {
+    "query": "123456",
+    "expected_role_id": null,
+    "type": "nonsensical",
+    "note": "Numeric string — should return low confidence."
+  },
+  {
+    "query": "I want to build web apps using containerization, microservices, and automation pipelines",
+    "expected_role_id": "role_devops_engineer",
+    "type": "synonym",
+    "note": "Uses 'containerization' (synonym for Docker) and 'automation pipelines' (synonym for CI/CD)."
+  },
+  {
+    "query": "I want to work with neural networks and statistical modeling",
+    "expected_role_id": "role_ml_engineer",
+    "type": "synonym",
+    "note": "Neural networks (deep learning) + statistical modeling — ML-domain synonyms."
+  },
+  {
+    "query": "I want to build chatbots and intelligent agents using transformer models",
+    "expected_role_id": "role_ai_engineer",
+    "type": "synonym",
+    "note": "Chatbots + intelligent agents + transformer models — AI Engineer synonym vocabulary."
+  },
+  {
+    "query": "I want to create component-based UIs with state management and routing",
+    "expected_role_id": "role_frontend_developer",
+    "type": "synonym",
+    "note": "Component-based UI (React), state management (Redux/Zustand), routing (React Router) — all Frontend concepts."
+  },
+  {
+    "query": "I have 5 years of Python experience and want to learn ML",
+    "expected_role_id": "role_ml_engineer",
+    "type": "experience_context",
+    "note": "Experience framing should not affect classification — the role intent is ML Engineer."
+  },
+  {
+    "query": "I'm a junior developer wanting to transition into AI",
+    "expected_role_id": "role_ai_engineer",
+    "type": "experience_context",
+    "note": "Seniority context should not affect classification."
+  },
+  {
+    "query": "I know React, TypeScript, Node.js, Python, SQL, Docker, Kubernetes, TensorFlow, and LangChain and want to learn everything",
+    "expected_role_id": null,
+    "type": "overspecified",
+    "note": "Lists skills from all 6 role domains. No single role is dominant.",
+    "ambiguous": true
+  },
+  {
+    "query": "I want to do AI but also deploy things on cloud",
+    "expected_role_ids": ["role_ai_engineer", "role_devops_engineer"],
+    "type": "ambiguous_two_roles",
+    "note": "AI Engineer + DevOps cloud deployment."
+  }
+]

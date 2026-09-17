@@ -1,0 +1,254 @@
+[
+  {
+    "query": "I want to become a backend developer building APIs and servers",
+    "expected_role_id": "role_backend_developer",
+    "expected_role": "Backend Developer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to learn database design, SQL, and FastAPI services",
+    "expected_role_id": "role_backend_developer",
+    "expected_role": "Backend Developer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to build REST services and write server-side Python code",
+    "expected_role_id": "role_backend_developer",
+    "expected_role": "Backend Developer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to develop backend systems with authentication and Docker deployments",
+    "expected_role_id": "role_backend_developer",
+    "expected_role": "Backend Developer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to become a frontend engineer with React and CSS",
+    "expected_role_id": "role_frontend_developer",
+    "expected_role": "Frontend Developer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to design responsive user interfaces and modern web applications",
+    "expected_role_id": "role_frontend_developer",
+    "expected_role": "Frontend Developer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to build beautiful websites using JavaScript, TypeScript, and Next.js",
+    "expected_role_id": "role_frontend_developer",
+    "expected_role": "Frontend Developer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to become an AI engineer building LLMs and RAG agents",
+    "expected_role_id": "role_ai_engineer",
+    "expected_role": "AI Engineer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to build generative AI solutions and prompt pipelines",
+    "expected_role_id": "role_ai_engineer",
+    "expected_role": "AI Engineer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to work with large language models and vector databases for AI applications",
+    "expected_role_id": "role_ai_engineer",
+    "expected_role": "AI Engineer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to build machine learning models and train neural networks",
+    "expected_role_id": "role_ml_engineer",
+    "expected_role": "Machine Learning Engineer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to work in data science, predictive modeling, and deep learning",
+    "expected_role_id": "role_ml_engineer",
+    "expected_role": "Machine Learning Engineer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to become a devops engineer managing cloud and kubernetes",
+    "expected_role_id": "role_devops_engineer",
+    "expected_role": "DevOps Engineer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to set up CI/CD pipelines, terraform infrastructure, and docker",
+    "expected_role_id": "role_devops_engineer",
+    "expected_role": "DevOps Engineer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to be a fullstack developer creating complete end to end apps",
+    "expected_role_id": "role_fullstack_developer",
+    "expected_role": "Full Stack Developer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to master MERN stack and frontend plus backend development",
+    "expected_role_id": "role_fullstack_developer",
+    "expected_role": "Full Stack Developer",
+    "type": "clear"
+  },
+  {
+    "query": "I want to code APIs",
+    "expected_role_id": "role_backend_developer",
+    "expected_role": "Backend Developer",
+    "type": "short"
+  },
+  {
+    "query": "machine learning career",
+    "expected_role_id": "role_ml_engineer",
+    "expected_role": "Machine Learning Engineer",
+    "type": "short"
+  },
+  {
+    "query": "devops",
+    "expected_role_id": "role_devops_engineer",
+    "expected_role": "DevOps Engineer",
+    "type": "short"
+  },
+  {
+    "query": "AI and deep learning stuff",
+    "expected_role_id": "role_ai_engineer",
+    "expected_role": "AI Engineer",
+    "type": "short"
+  },
+  {
+    "query": "fruntend develper with reeact and nexxt.js",
+    "expected_role_id": "role_frontend_developer",
+    "expected_role": "Frontend Developer",
+    "type": "typo"
+  },
+  {
+    "query": "i wana do bacend develoment with python and apis",
+    "expected_role_id": "role_backend_developer",
+    "expected_role": "Backend Developer",
+    "type": "typo"
+  },
+  {
+    "query": "mchine lerning engineerng",
+    "expected_role_id": "role_ml_engineer",
+    "expected_role": "Machine Learning Engineer",
+    "type": "typo"
+  },
+  {
+    "query": "I want to build web apps using containerization, microservices, and automation pipelines",
+    "expected_role_id": "role_devops_engineer",
+    "expected_role": "DevOps Engineer",
+    "type": "synonym"
+  },
+  {
+    "query": "I want to work with neural networks and statistical modeling",
+    "expected_role_id": "role_ml_engineer",
+    "expected_role": "Machine Learning Engineer",
+    "type": "synonym"
+  },
+  {
+    "query": "I want to build chatbots and intelligent agents using transformer models",
+    "expected_role_id": "role_ai_engineer",
+    "expected_role": "AI Engineer",
+    "type": "synonym"
+  },
+  {
+    "query": "I want to create component-based UIs with state management and routing",
+    "expected_role_id": "role_frontend_developer",
+    "expected_role": "Frontend Developer",
+    "type": "synonym"
+  },
+  {
+    "query": "I want to work with cloud and backend systems",
+    "expected_role_id": ["role_backend_developer", "role_devops_engineer"],
+    "expected_role": "ambiguous",
+    "type": "ambiguous",
+    "note": "Could reasonably be Backend Developer or DevOps Engineer"
+  },
+  {
+    "query": "I know Python and want to build AI-powered web applications with APIs",
+    "expected_role_id": ["role_backend_developer", "role_ai_engineer", "role_fullstack_developer"],
+    "expected_role": "ambiguous",
+    "type": "ambiguous",
+    "note": "Mentions backend (APIs), AI (AI-powered), and web apps (full stack)"
+  },
+  {
+    "query": "I want to do both frontend and backend but also ML",
+    "expected_role_id": ["role_fullstack_developer", "role_ml_engineer"],
+    "expected_role": "ambiguous",
+    "type": "ambiguous",
+    "note": "Mentions three different role domains"
+  },
+  {
+    "query": "I want to work in cybersecurity and ethical hacking",
+    "expected_role_id": null,
+    "expected_role": "out_of_scope",
+    "type": "out_of_scope",
+    "note": "No cybersecurity role in current taxonomy"
+  },
+  {
+    "query": "I want to become a data engineer building ETL pipelines and Kafka streams",
+    "expected_role_id": null,
+    "expected_role": "out_of_scope",
+    "type": "out_of_scope",
+    "note": "Data Engineering not in current taxonomy"
+  },
+  {
+    "query": "I want to work as a mobile developer for iOS and Android apps",
+    "expected_role_id": null,
+    "expected_role": "out_of_scope",
+    "type": "out_of_scope",
+    "note": "Mobile development not in current taxonomy"
+  },
+  {
+    "query": "I want to become a pediatric surgeon",
+    "expected_role_id": null,
+    "expected_role": "out_of_scope",
+    "type": "out_of_scope",
+    "note": "Completely unrelated domain"
+  },
+  {
+    "query": "I know React, TypeScript, Node.js, Python, SQL, Docker, Kubernetes, TensorFlow, and LangChain and want to learn everything",
+    "expected_role_id": "role_fullstack_developer",
+    "expected_role": "Full Stack Developer",
+    "type": "overspecified",
+    "note": "Lists skills from multiple roles, many already mastered"
+  },
+  {
+    "query": "I have 5 years of Python experience and want to learn ML",
+    "expected_role_id": "role_ml_engineer",
+    "expected_role": "Machine Learning Engineer",
+    "type": "experience_context",
+    "note": "Experience context should not affect role classification"
+  },
+  {
+    "query": "I am a junior developer wanting to transition into AI",
+    "expected_role_id": "role_ai_engineer",
+    "expected_role": "AI Engineer",
+    "type": "experience_context"
+  },
+  {
+    "query": "I want to use FastAPI to build microservices deployed on AWS with Kubernetes",
+    "expected_role_id": ["role_backend_developer", "role_devops_engineer"],
+    "expected_role": "ambiguous",
+    "type": "ambiguous",
+    "note": "Backend (FastAPI) + DevOps (AWS, Kubernetes)"
+  },
+  {
+    "query": "?",
+    "expected_role_id": null,
+    "expected_role": "low_confidence",
+    "type": "nonsensical",
+    "note": "Single punctuation character"
+  },
+  {
+    "query": "asdfghjkl",
+    "expected_role_id": null,
+    "expected_role": "low_confidence",
+    "type": "nonsensical",
+    "note": "Random keyboard characters"
+  }
+]
