@@ -269,8 +269,33 @@ def delete_history_item(learner_id: str, history_id: str, authorization: Optiona
     verify_learner_ownership(learner_id, authorization)
 
     hist_doc = db.get_document("roadmap_history", history_id)
-    if hist_doc and hist_doc.get("learner_id") == learner_id:
-        db.delete_document("roadmap_history", history_id)
-        return {"status": "success", "message": "History item removed."}
-    raise HTTPException(status_code=404, detail="History item not found.")
+    if not hist_doc or hist_doc.get("learner_id") != learner_id:
+        raise HTTPException(status_code=404, detail="History item not found.")
+
+    deleted_target_role_id = hist_doc.get("target_role_id")
+    db.delete_document("roadmap_history", history_id)
+
+    # Check remaining history items for this learner
+    remaining = db.query_documents("roadmap_history", "learner_id", learner_id)
+    active_rm = db.get_document("roadmaps", learner_id)
+
+    if active_rm and active_rm.get("target_role_id") == deleted_target_role_id:
+        if remaining:
+            # Switch active roadmap to the most recently updated remaining history item
+            remaining.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
+            next_active = remaining[0]
+            new_active_record = {
+                "learner_id": learner_id,
+                "target_role": next_active.get("target_role", "Software Engineer"),
+                "target_role_id": next_active.get("target_role_id", "role_backend_developer"),
+                "steps": next_active.get("steps", []),
+                "gap_summary": next_active.get("gap_summary", {"missing_skills": [], "matched_skills": []}),
+                "updated_at": next_active.get("updated_at", datetime.now(timezone.utc).isoformat())
+            }
+            db.set_document("roadmaps", learner_id, new_active_record)
+        else:
+            # No roadmaps left: completely clear active roadmap
+            db.delete_document("roadmaps", learner_id)
+
+    return {"status": "success", "message": "History item removed."}
 

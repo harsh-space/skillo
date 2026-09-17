@@ -132,7 +132,6 @@ export default function HistoryDrawer({
           handleItemClick(remaining[0]);
         } else {
           onNewRoadmap();
-          onClose();
         }
       }
     } catch (err) {
@@ -145,7 +144,6 @@ export default function HistoryDrawer({
           handleItemClick(remaining[0]);
         } else {
           onNewRoadmap();
-          onClose();
         }
       }
     }
@@ -218,12 +216,23 @@ export default function HistoryDrawer({
               <p className="text-xs text-slate-400">Loading roadmaps...</p>
             </div>
           ) : historyItems.length === 0 ? (
-            <div className="py-12 text-center space-y-2 px-3">
+            <div className="py-12 text-center space-y-3 px-3">
               <MessageSquare className="w-8 h-8 text-slate-600 mx-auto" />
-              <h4 className="text-xs font-bold text-slate-300">No Roadmaps Yet</h4>
+              <h4 className="text-xs font-bold text-slate-300">No Roadmaps Left</h4>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Click "+ New Career Roadmap" to create your first learning path.
+                All previous roadmaps have been removed. Click below to start a new learning path.
               </p>
+              <button
+                type="button"
+                onClick={() => {
+                  onNewRoadmap();
+                  onClose();
+                }}
+                className="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-indigo-950/30 transition-all cursor-pointer mt-2"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>+ New Career Roadmap</span>
+              </button>
             </div>
           ) : (
             historyItems.map((item) => {
