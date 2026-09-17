@@ -92,7 +92,7 @@ def run_gap_analysis(
 ) -> GapSummary:
     """
     Compares learner's current skills against target role required skills using
-    sentence-transformer embeddings and cosine similarity matrix.
+    TF-IDF character n-gram feature vectors and cosine similarity matrix.
     """
     role = db.get_document("roles", target_role_id)
     if not role:
@@ -141,10 +141,7 @@ def run_gap_analysis(
             if req_emb is not None:
                 for cs_name, cs_emb in current_embeddings:
                     sim = _compute_cosine_similarity(req_emb, cs_emb)
-                    # Specific domain normalization
-                    if "python (basic)" in cs_name.lower() and "python (advanced)" in req_name.lower():
-                        sim = 0.52
-                    elif cs_name.lower() == req_name.lower():
+                    if cs_name.lower() == req_name.lower():
                         sim = 1.0
 
                     if sim > best_sim:
@@ -153,8 +150,6 @@ def run_gap_analysis(
         else:
             for cs_name in current_skills:
                 sim = _fallback_similarity(req_name, cs_name)
-                if "python (basic)" in cs_name.lower() and "python (advanced)" in req_name.lower():
-                    sim = 0.52
                 if sim > best_sim:
                     best_sim = sim
                     best_match_skill = cs_name
