@@ -127,24 +127,20 @@ export default function HistoryDrawer({
       await deleteHistoryItem(targetId, historyId);
       const remaining = historyItems.filter((h) => h.history_id !== historyId);
       setHistoryItems(remaining);
-      if (isActive) {
-        if (remaining.length > 0) {
-          handleItemClick(remaining[0]);
-        } else {
-          onNewRoadmap();
-        }
+      if (remaining.length === 0) {
+        onNewRoadmap();
+      } else if (isActive) {
+        handleItemClick(remaining[0]);
       }
     } catch (err) {
       console.error('Failed to delete history item:', err);
       // Optimistic removal
       const remaining = historyItems.filter((h) => h.history_id !== historyId);
       setHistoryItems(remaining);
-      if (isActive) {
-        if (remaining.length > 0) {
-          handleItemClick(remaining[0]);
-        } else {
-          onNewRoadmap();
-        }
+      if (remaining.length === 0) {
+        onNewRoadmap();
+      } else if (isActive) {
+        handleItemClick(remaining[0]);
       }
     }
   };

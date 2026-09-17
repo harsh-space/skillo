@@ -309,3 +309,46 @@ def test_auth_signup_login_roundtrip():
     assert login_res.user_id == signup_res.user_id
     assert login_res.learner_id == signup_res.learner_id
 
+
+def test_roadmap_deletion_and_history_lifecycle():
+    """Validates that deleting a roadmap removes it from history, clears active roadmap, and does not resurrect on query."""
+    import secrets
+    from fastapi import HTTPException
+    from app.api.recommend import generate_recommendation, get_learner_history, get_learner_roadmap, delete_history_item
+    from app.models.schemas import RecommendRequest
+
+    learner_id = f"test_del_learner_{secrets.token_hex(4)}"
+    db.set_document("learners", learner_id, {
+        "learner_id": learner_id,
+        "name": "Delete Tester",
+        "current_skills": ["HTML", "CSS"],
+        "target_role_id": "role_backend_developer",
+        "target_role": "Backend Developer",
+        "created_at": "2026-09-17T00:00:00Z",
+        "updated_at": "2026-09-17T00:00:00Z"
+    })
+
+    # 1. Generate roadmap
+    rec_res = generate_recommendation(RecommendRequest(learner_id=learner_id, force_regenerate=True))
+    assert rec_res is not None
+    assert len(rec_res.roadmap) > 0
+
+    # 2. Verify history has exactly 1 item
+    history_items = get_learner_history(learner_id)
+    assert len(history_items) == 1
+    hist_id = history_items[0].history_id
+
+    # 3. Delete the roadmap item
+    del_res = delete_history_item(learner_id, hist_id)
+    assert del_res["status"] == "success"
+
+    # 4. Verify history is completely empty and no ghost re-seeding occurs
+    updated_history = get_learner_history(learner_id)
+    assert len(updated_history) == 0
+
+    # 5. Verify active roadmap is cleared and returns 404
+    with pytest.raises(HTTPException) as exc_info:
+        get_learner_roadmap(learner_id)
+    assert exc_info.value.status_code == 404
+
+
