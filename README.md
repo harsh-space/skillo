@@ -70,6 +70,35 @@ Skillo AI currently supports 6 career paths:
 
 ---
 
+## How the AI Actually Works (v1.1)
+
+```
+Goal Classification:    Character n-gram TF-IDF → Cosine Similarity → Alias Keyword Boosts (bounded to ≤ 1.0)
+                        (Optional Google Gemini Flash SDK fallback if primary parse is unavailable)
+Gap Detection:          Sublinear TF-IDF Cosine Similarity, threshold τ = 0.60
+Path Generation:        NetworkX Directed Acyclic Graph (DAG) topological sort with prerequisite closure
+Explanations (XAI):     Fact-grounded synthesis from DAG graph structure (enriched by Gemini if API key set)
+Adaptive Feedback:      Rule-based feedback mutation (Score <50% → Remedial, ≥90% → Accelerated)
+Security:               Bcrypt adaptive password hashing + session token ownership validation
+
+Dataset Counts:         36 skills · 6 roles · 29 prerequisite edges · 49 resources
+```
+
+---
+
+## What's New in v1.1 (Stabilization Release)
+
+- **Bounded Cosine Similarity**: Fixed similarity calculations in goal parsing to strictly clamp values to $[0.0, 1.0]$.
+- **Honest Goal Fallback**: Unrecognized goals clearly indicate low confidence rather than silently assigning a default role.
+- **Robust Gap Detection**: Removed fragile hardcoded skill similarity exceptions; char-ngram model naturally detects sub-threshold gaps.
+- **Cycle-Safe Path Generator**: Replaced silent fallback on circular dependencies with structured logging and explicit error raising.
+- **Bcrypt Security**: Replaced fast SHA-256 with `bcrypt` password hashing and per-user salt generation.
+- **CORS Hardening**: Configured strict CORS handling via `ALLOWED_ORIGINS` environment variable.
+- **Learner Profile Integrity**: Missing learner profiles return HTTP 404; requests validate Bearer token ownership.
+- **Reproducibility & Baseline Evaluation**: Added comprehensive test suite and automated baseline metrics script (`BASELINE.md`).
+
+---
+
 ## System Architecture
 
 The app is split into two main parts:
@@ -92,11 +121,6 @@ The app is split into two main parts:
 All your progress, skills, and roadmaps are stored in a database. By default it connects to **Google Firestore** (Google's cloud database). If that's not available, it automatically falls back to a local file on your computer — no setup needed.
 
 ### How everything connects
-<!-- <p align="center">
-  <img src="docs\career_ai_backend_flow_architecturea.png" width="650" alt="Skillo AI Backend Flow Architecture"/>
-  <br/>
-  <em>Figure 1: How data flows from your goal input through to the final roadmap</em>
-</p> -->
 
 <p align="center">
   <img src="docs\career_ai_architecture_layersa.png" width="650" alt="Skillo AI Architectural Layers"/>

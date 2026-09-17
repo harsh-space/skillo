@@ -65,16 +65,16 @@ This is a direct 1:1 mapping to HCL's own architecture diagram: Conversational I
 
 | Layer | Choice | Why |
 |---|---|---|
-| Frontend | Next.js + React + Tailwind CSS | Fast to build, deploys instantly to Vercel, good default component ecosystem |
-| Backend | FastAPI (Python) | Already familiar to the team; async-friendly; auto-generates OpenAPI docs for free |
-| AI/ML — embeddings | `sentence-transformers` (`all-MiniLM-L6-v2`) | Small, fast, CPU-friendly, no GPU needed — runs fine on free-tier hosting |
-| AI/ML — goal parsing & explanation phrasing | LLM API (Claude or OpenAI, free/low-cost tier) with structured-output prompting | Far more reliable than a custom-trained NLP model in a 6-day window |
-| Graph logic | `networkx` | Battle-tested DAG construction + topological sort, minimal code |
-| Database | Firebase Firestore | Team already has experience; no server ops; generous free tier |
-| Auth (minimal) | Firebase Auth (email link or anonymous) | Fast to wire up, avoids building auth from scratch |
+| Frontend | Next.js + React + Tailwind CSS | Fast to build, deploys instantly to Vercel, responsive component ecosystem |
+| Backend | FastAPI (Python) | High-performance async framework with automatic OpenAPI documentation |
+| AI/ML — Feature Extraction & Similarity | `scikit-learn` (`TfidfVectorizer`, char n-grams `(3,5)`) + `numpy` cosine similarity | Ultra-lightweight (<30MB RAM), robust against subwords and typos, fast CPU inference |
+| AI/ML — LLM Synthesis & Fallback | Google GenAI SDK (`gemini-flash-latest`) / OpenAI | Structured explanation synthesis and nuanced NLP parsing |
+| Graph logic | `networkx` | DAG construction, transitive prerequisite closure, and topological sorting |
+| Database | Firebase Firestore / Local JSON fallback | Dual-mode persistence with zero-config local file support |
+| Auth & Security | `bcrypt` password hashing + Session Bearer tokens | Secure adaptive password hashing with per-user salt and ownership validation |
 | Deployment — frontend | Vercel | Zero-config Next.js deploys |
-| Deployment — backend | Render or Railway (free tier) | Simple FastAPI deploys, HTTPS out of the box |
-| Version control | GitHub (public/access-shared repo, required by HCL) | — |
+| Deployment — backend | Render or Railway | Containerized / direct FastAPI deploy |
+| Version control | GitHub | Git repository with tag-based release history |
 
 ---
 
