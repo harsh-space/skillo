@@ -1,246 +1,257 @@
 # Skillo AI
 
-## A personalized learning app that creates a custom career roadmap based on what you already know
+## An intelligent career learning assistant that maps your current skills, generates ordered prerequisite roadmaps, and adapts in real time based on your progress
 
-> Most learning websites just show you a list of courses. Skillo AI figures out *which skills you already have*, *which ones you're missing*, and builds a step-by-step plan in the right order — and adjusts it based on how well you're doing.
+> Static learning roadmaps only show you a fixed list of topics. Skillo AI identifies what you already know, pinpoints what you are missing, arranges your learning path in strict prerequisite order, and dynamically updates your roadmap when you take quizzes.
 
 > [!IMPORTANT]
-> You can test the application directly using the following deployed environments:
-> - **Live Web App & Full Stack API**: [skillo-frontend-amber.vercel.app](https://skillo-frontend-amber.vercel.app/)
+> **Live Web App & Interactive Demo**: [skillo-frontend-amber.vercel.app](https://skillo-frontend-amber.vercel.app/)
 
 ---
 
 ## What Is Skillo AI?
 
-Skillo AI is a web app that helps you plan your career learning path. You tell it what skills you currently have and what kind of job you want to get (for example: *"I know basic HTML and Python and want to become a backend developer"*), and it:
+When learning to become a software engineer or switching careers, it is easy to get overwhelmed by thousands of courses and tutorials without knowing where to begin or what to study first. Generic roadmaps assume everyone starts from scratch, forcing experienced learners to repeat familiar concepts while leaving beginners stuck on advanced topics without foundational prerequisites.
 
-1. **Understands your goal** — You write your goal in plain sentences, no specific format needed. The app reads it and figures out which job role you're aiming for.
-2. **Finds your skill gaps** — It compares what you already know against what the target job requires, and identifies exactly what's missing.
-3. **Builds a learning plan in the right order** — Some skills depend on others (you need to know Python basics before you can learn advanced Python). Skillo AI respects these dependencies and always shows you what to learn *first*.
-4. **Explains every step** — For each skill in your plan, you can click to see *why* it's there: what it builds on and what it unlocks next.
-5. **Adapts based on your quiz results** — After each quiz:
-   - **If you score below 50%**: A short refresher lesson is automatically added to your plan right after that step.
-   - **If you score 90% or above**: Following steps that you're clearly ready for get marked as skippable.
-   - **Otherwise**: Your progress moves forward and is saved.
+**Skillo AI** solves this by acting as a smart, personalized career learning guide. You tell it your current skills and type your career goal in natural language (for example: *"I know HTML, CSS, and basic Python and want to become a backend developer with databases and APIs"*), and the system:
 
----
-
-## The Problem It Solves
-
-When you search for "how to become a backend developer" online, you get a flood of articles, videos, and courses — but no guidance on *where to start* based on *what you already know*. Common issues:
-
-1. **Search engines don't know what you already know** — They show you everything, including stuff you've already learned or don't need yet.
-2. **Generic roadmaps treat everyone the same** — They assume you're starting from zero, so experienced people have to sit through things they already know.
-3. **Most platforms don't explain why** — They tell you *what* to learn but not *why this topic comes before that one*.
-4. **No adjustment when you struggle** — If you fail a quiz, most platforms just mark it failed. They don't change your plan to help you fill the gap.
+1. **Understands Your Goal** — Reads your unformatted sentence and identifies your target career role using semantic similarity and keyword analysis.
+2. **Finds Your Exact Skill Gaps** — Compares what you already know against the target role's requirements, distinguishing skill depth (such as basic vs advanced levels) so mastered skills are acknowledged and missing ones are highlighted.
+3. **Builds an Ordered Learning Path** — Uses a prerequisite dependency graph (Directed Acyclic Graph) to sequence topics so you always learn foundations before advanced concepts.
+4. **Explains Every Step (Explainable AI)** — Provides plain-language explanations for each milestone, explaining what previous skills it builds on and what future topics it unlocks.
+5. **Adapts to Quiz Performance in Real Time** — Evaluates your understanding after each module and dynamically modifies your active roadmap:
+   - **Score < 50%**: Automatically injects a targeted refresher lesson immediately after the current step.
+   - **Score ≥ 90%**: Marks downstream dependent topics as skippable to accelerate your learning.
+   - **Score 50% – 89%**: Marks the step as completed and smoothly advances your progress.
+6. **Manages Multiple Career Roadmaps** — Lets you explore different career trajectories, switch between past roadmaps with a history drawer, or delete roadmaps with live synchronization.
 
 ---
 
-## Features
+## Why It Matters: The Problem vs The Solution
 
-- **User accounts & session saving** — Secure sign up and login so your custom roadmaps, quizzes, and completed tasks are saved to your personal profile.
-- **Plain-language goal input** — Just type what you want to become. No dropdowns or complicated forms needed.
-- **Skill gap detection** — Shows exactly which skills you're missing versus which ones you already have.
-- **Ordered learning plan** — Steps are arranged so each one builds naturally on the previous one.
-- **"Why is this here?" explanations** — Click any step to get a clear explanation of why it comes at that point in your plan.
-- **Quizzes with real-time plan adjustment** — Your roadmap actually changes based on your quiz results.
-- **Progress tracking** — Your completed steps, percentage progress, and quiz history are all saved.
-- **Career history sidebar** — Like a chat history in ChatGPT, you can switch between different career paths you've explored before, and your full roadmap is restored instantly.
-- **Ultra-lightweight & cloud ready** — Uses under 60MB of RAM, making it fast and completely free to host on platforms like Render and Vercel.
-- **Works offline too** — If no internet database is connected, everything automatically saves locally on your machine.
+| The Traditional Problem | How Skillo AI Solves It |
+|---|---|
+| **Keyword search overload**: Searching online returns isolated tools without explaining what prerequisites you need first. | **Prerequisite Graph Engine**: Automatically discovers unstated foundational requirements (e.g. Linux CLI before Docker) and places them in logical order. |
+| **One-size-fits-all roadmaps**: Generic roadmaps ignore what you already know, wasting your time on mastered topics. | **Skill Gap Analysis**: Compares your stated background against target requirements and creates a custom curriculum containing only your actual gaps. |
+| **Black-box course recommendations**: Platforms recommend courses without explaining why a topic is placed at a specific point. | **Grounded Mentor Explanations**: Inspects the dependency graph to provide transparent explanations of why each step is recommended and what it unlocks. |
+| **Rigid, non-adaptive curricula**: If you fail a quiz, traditional platforms mark it failed without helping you fix the underlying gap. | **Real-Time Adaptive Feedback**: Dynamically injects targeted refresher modules or fast-tracks steps based on your live assessment scores. |
 
 ---
 
-## Supported Career Paths
+## Key Features
 
-Skillo AI currently supports 6 career paths:
-
-<div align="center">
-
-| Career Path | What You'll Learn |
-|:---:|:---|
-| **Frontend Developer** | HTML, CSS, JavaScript, TypeScript, React, Next.js |
-| **Backend Developer** | Python, SQL, REST APIs, Authentication, Docker |
-| **Full Stack Developer** | Both frontend and backend skills combined |
-| **Machine Learning Engineer** | Python, Data Analysis, ML algorithms, Deep Learning |
-| **AI Engineer** | Python, ML, Deep Learning, LLMs, Vector Databases |
-| **DevOps Engineer** | Linux, Git, Docker, Kubernetes, Cloud, CI/CD |
-
-</div>
+- **Natural Language Career Goal Input** — Express your goals in plain sentences. No rigid drop-downs or predefined forms required.
+- **Semantic Skill Gap Detection** — Accurately identifies missing competencies while recognizing what you have already mastered.
+- **Graph-Based Prerequisite Ordering** — Built on Directed Acyclic Graph (DAG) algorithms to guarantee dependency-respecting learning sequences with zero circular loops.
+- **Fact-Grounded Explanations** — Transparent "Why this recommendation?" rationales synthesized directly from graph dependency relationships.
+- **Interactive Quizzes with Live Adaptation** — Test your knowledge on each milestone and watch the roadmap update its structure immediately.
+- **Multi-Roadmap History Drawer** — Easily browse, activate, or remove your previous learning paths from a sliding sidebar.
+- **Secure Authentication & Profiles** — User accounts with password hashing, persistent learner sessions, and ownership verification.
+- **Dual-Tier Data Storage** — Works out-of-the-box with Google Cloud Firestore or seamless zero-config local storage when offline.
+- **Modern Glassmorphic UI** — Fast, responsive Next.js interface with progress tracking, visual timelines, and interactive flyouts.
 
 ---
 
-## How the AI Actually Works (v1.1)
+## Supported Career Roles
+
+Skillo AI comes pre-loaded with curated competencies across 6 primary engineering tracks:
+
+| Career Track | Core Focus & Covered Competencies |
+|---|---|
+| **Frontend Developer** | HTML, CSS, JavaScript, TypeScript, React, Next.js, Web Performance |
+| **Backend Developer** | Python, SQL & Relational Databases, REST APIs, Authentication & JWT, Docker |
+| **Full Stack Developer** | Complete frontend UI engineering and backend API & database architecture |
+| **Machine Learning Engineer** | Python, Data Analysis & Pandas, Machine Learning, Deep Learning & PyTorch |
+| **AI Engineer** | Python, ML & Deep Learning, LLMs & Prompt Engineering, Vector Databases & RAG |
+| **DevOps Engineer** | Linux CLI, Git & GitHub, Docker, Kubernetes, CI/CD Pipelines, Cloud Infrastructure |
+
+*The underlying taxonomy includes **36 skills**, **6 roles**, **29 prerequisite dependency relationships**, and **49 curated learning resources**.*
+
+---
+
+## How It Works Under the Hood
 
 ```
-Goal Classification:    Character n-gram TF-IDF → Cosine Similarity → Alias Keyword Boosts (bounded to ≤ 1.0)
-                        (Optional Google Gemini Flash SDK fallback if primary parse is unavailable)
-Gap Detection:          Sublinear TF-IDF Cosine Similarity, threshold τ = 0.60
-Path Generation:        NetworkX Directed Acyclic Graph (DAG) topological sort with prerequisite closure
-Explanations (XAI):     Fact-grounded synthesis from DAG graph structure (enriched by Gemini if API key set)
-Adaptive Feedback:      Rule-based feedback mutation (Score <50% → Remedial, ≥90% → Accelerated)
-Security:               Bcrypt adaptive password hashing + session token ownership validation
-
-Dataset Counts:         36 skills · 6 roles · 29 prerequisite edges · 49 resources
+   Learner Input (Current Skills + Free-Text Goal)
+                         │
+                         ▼
+        [ Natural Language Goal Parser ]
+   (Character n-gram TF-IDF & Semantic Cosine Matching)
+                         │
+                         ▼
+           [ Skill Gap Analysis Engine ]
+    (Dense similarity comparison & level clamping)
+                         │
+                         ▼
+       [ Prerequisite Graph Path Generator ]
+     (NetworkX DAG closure & topological sorting)
+                         │
+                         ▼
+           [ Explainable AI (XAI) Engine ]
+   (Fact-grounded rationale synthesis from graph topology)
+                         │
+                         ▼
+      [ Interactive Dashboard & Adaptive Loop ]
+  (Real-time roadmap mutation on quiz assessment events)
 ```
 
----
-
-## What's New in v1.1 (Stabilization Release)
-
-- **Bounded Cosine Similarity**: Fixed similarity calculations in goal parsing to strictly clamp values to $[0.0, 1.0]$.
-- **Honest Goal Fallback**: Unrecognized goals clearly indicate low confidence rather than silently assigning a default role.
-- **Robust Gap Detection**: Removed fragile hardcoded skill similarity exceptions; char-ngram model naturally detects sub-threshold gaps.
-- **Cycle-Safe Path Generator**: Replaced silent fallback on circular dependencies with structured logging and explicit error raising.
-- **Bcrypt Security**: Replaced fast SHA-256 with `bcrypt` password hashing and per-user salt generation.
-- **CORS Hardening**: Configured strict CORS handling via `ALLOWED_ORIGINS` environment variable.
-- **Learner Profile Integrity**: Missing learner profiles return HTTP 404; requests validate Bearer token ownership.
-- **Reproducibility & Baseline Evaluation**: Added comprehensive test suite and automated baseline metrics script (`BASELINE.md`).
+1. **Goal Parsing**: Converts free-text sentences into structured roles by calculating character-level n-gram term frequency and cosine similarity against role descriptions and aliases.
+2. **Gap Analysis**: Compares the learner's existing skills against the role's required skills using sublinear TF-IDF vectors, ensuring basic and advanced skills are distinguished accurately.
+3. **Graph Generation**: Constructs a directed dependency graph, finds all direct and indirect prerequisites, and applies topological sorting so that every skill appears after its dependencies.
+4. **Explainable AI (XAI)**: Examines upstream dependencies and downstream milestones in the graph to generate concise, trustworthy explanations for every step.
+5. **Adaptive Feedback Loop**: When a learner takes a quiz, the feedback service processes the score and dynamically mutates the roadmap in memory and database storage.
 
 ---
 
 ## System Architecture
 
-The app is split into two main parts:
+The application is structured into two decoupled tiers:
 
-**Backend (the "brain")** — A Python server that:
-- Reads your goal text and identifies which career path you're aiming for
-- Checks your current skills against the requirements
-- Calculates which missing skills need to come first (based on what depends on what)
-- Generates the explanation for each step
-- Updates your plan whenever you submit a quiz
+### 1. Backend Service (FastAPI & Python)
+- **API Endpoints**: RESTful routes for authentication, profile management, goal parsing, recommendations, explanations, quizzes, and roadmap history.
+- **Graph & Gap Engine**: NetworkX DAG dependency solver and scikit-learn vector matching.
+- **Persistence Layer**: Unified database client supporting Google Cloud Firestore and local JSON file storage.
 
-**Frontend (what you see)** — A web interface built with Next.js that:
-- Shows the onboarding wizard (name, current skills, goal)
-- Displays your personalized roadmap as a visual timeline
-- Shows progress stats, skill gap breakdown, and a side panel explanation
-- Has a sliding history drawer to switch between past roadmaps
-
-### How data is stored
-
-All your progress, skills, and roadmaps are stored in a database. By default it connects to **Google Firestore** (Google's cloud database). If that's not available, it automatically falls back to a local file on your computer — no setup needed.
-
-### How everything connects
+### 2. Frontend Application (Next.js & React)
+- **Onboarding Wizard**: Step-by-step goal entry and interactive skill selector.
+- **Dashboard & Timeline**: Real-time progress indicators, milestone accordion cards, and collapsible flyouts for gap breakdown and mastered skills.
+- **Contextual Side Panels**: Non-intrusive explanation card and sliding multi-roadmap history drawer.
 
 <p align="center">
-  <img src="docs\career_ai_architecture_layersa.png" width="650" alt="Skillo AI Architectural Layers"/>
+  <img src="docs/career_ai_architecture_layers.png" width="650" alt="Skillo AI System Architecture Layers"/>
   <br/>
-  <em>Figure 1: The different layers of the system and how they work together</em>
+  <em>Figure 1: Modular system architecture and layer breakdown</em>
+</p>
+
+<p align="center">
+  <img src="docs/career_ai_backend_flow_architecture.png" width="650" alt="Skillo AI Backend Processing Flow"/>
+  <br/>
+  <em>Figure 2: End-to-end data processing and adaptive telemetry flow</em>
 </p>
 
 ---
 
-## How to Run It
+## Step-by-Step Installation & Setup
 
-### What you need installed first
-- **Python 3.10 or newer**
-- **Node.js 18 or newer** and **npm**
+### Prerequisites
+- **Python 3.10+** (Python 3.11+ recommended)
+- **Node.js 18+** and **npm**
 
 ---
 
-### Step 1 — Download the code
+### Method 1: Local Development Setup
+
+#### 1. Clone the Repository
 ```bash
 git clone https://github.com/harsh-space/skillo.git
 cd skillo
 ```
 
-### Step 2 — Set up and start the backend server
+#### 2. Configure and Start Backend
 ```bash
-# Create an isolated Python environment
+# Create and activate a virtual environment
 python -m venv venv
 
-# Activate it (Windows)
+# On Windows (PowerShell):
 venv\Scripts\activate
-# Activate it (Mac/Linux)
+# On macOS / Linux:
 source venv/bin/activate
 
-# Install all required Python packages
+# Install Python dependencies
 pip install -r backend/requirements.txt
 
-# (Optional) Add your API keys to a .env file:
+# (Optional) Set up cloud credentials in .env:
 # GOOGLE_APPLICATION_CREDENTIALS=backend/firebase-key.json
-# GEMINI_API_KEY=your_key_here
+# GEMINI_API_KEY=your_gemini_api_key_here
 
-# Fill the database with the initial skills and roles data
+# Seed initial taxonomy data (into Firestore or local JSON)
 python scripts/seed_db.py
 
-# Run automated tests to make sure everything works
+# Run backend automated tests
 pytest backend/tests/test_backend.py -v
 
-# Start the backend server
+# Start FastAPI backend server
 python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
+The backend server runs at `http://127.0.0.1:8000`. Interactive OpenAPI documentation is available at `http://127.0.0.1:8000/docs`.
 
-The backend runs at `http://127.0.0.1:8000`. You can browse all available API endpoints at `http://127.0.0.1:8000/docs`.
-
-### Step 3 — Set up and start the frontend (in a new terminal window)
+#### 3. Configure and Start Frontend
+In a separate terminal window:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-
-Then open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your web browser.
 
 ---
 
-### Alternative: Run with Docker (one command)
-If you have Docker installed, you can run the whole app with:
+### Method 2: Docker Container
+
+You can run the entire backend in a standalone Docker container:
 ```bash
 docker build -t skillo-ai .
 docker run -p 8000:8000 skillo-ai
 ```
----
-
-## Try This Example
-
-Here's a quick walkthrough to see the app in action:
-
-1. **Sign up / log in** — Create an account on the login screen.
-2. **Choose your current skills** — Select `HTML`, `CSS`, and `Python (basic)` from the skill picker.
-3. **Type your goal** — Write: *"I want to become a backend developer"*
-4. **See your roadmap** — Your personalized plan appears. Steps are ordered correctly: Python (advanced) → SQL → REST APIs → Git → Authentication → Docker.
-5. **Click "Why this?"** on the `REST APIs` step to see the explanation:
-   > *"Building on your Python and SQL knowledge, REST APIs let you expose your data to other apps — a core requirement for backend development. This unlocks Authentication and Docker next."*
-6. **Take a quiz** on Step 1 (`Python (advanced)`) and choose **Score: 40% (Fail)**:
-   > A **refresher lesson** is automatically added right after that step to help you before moving on.
 
 ---
 
-## Project Folder Structure
+## Step-by-Step Validation Walkthrough
+
+To experience the core features and adaptive feedback loop:
+
+1. **Sign Up / Log In**: Create an account or log in on the start screen.
+2. **Select Initial Skills**: Choose `HTML`, `CSS`, and `Python (basic)` in the onboarding skill picker.
+3. **Enter Career Goal**: Type *"I want to become a backend developer"* and submit.
+4. **Inspect Generated Roadmap**: Skillo AI extracts the `Backend Developer` role and orders your missing competencies in prerequisite order:
+   `Python (advanced) → SQL & Relational Databases → REST APIs → Git & GitHub → Authentication & JWT → Docker & Containers`
+5. **View Step Explanation**: Click **"Why this recommendation?"** on the `REST APIs` step:
+   > *"Building on your Python (advanced) and SQL foundations, mastering REST APIs enables you to expose backend data services required for your Backend Developer goal. This unlocks subsequent modules in Authentication & JWT and containerized deployment with Docker."*
+6. **Trigger Adaptive Remedial Lesson**:
+   - Open the quiz on Step 1 (`Python (advanced)`).
+   - Select **Score 40% (Fail)** and submit.
+   - A targeted **Remedial Refresher** module is dynamically inserted immediately after Step 1.
+7. **Test Roadmap History & Deletion**:
+   - Open the **History** drawer from the top bar to see your active and past roadmaps.
+   - Delete a roadmap to confirm it is cleanly removed from both local state and database records.
+
+---
+
+## Project Directory Structure
 
 ```
 .
 ├── backend/
 │   ├── app/
-│   │   ├── api/          # The server endpoints (what the frontend talks to)
-│   │   ├── services/     # The core logic (goal reading, gap finding, path building, quizzes)
-│   │   ├── models/       # Data structure definitions
-│   │   ├── data/         # The skills, roles, and relationships database files
-│   │   └── main.py       # The server entry point
-│   ├── tests/            # Automated tests
-│   └── requirements.txt  # List of Python packages needed
+│   │   ├── api/          # FastAPI routes (auth, profile, goal, recommend, feedback, explain, taxonomy)
+│   │   ├── services/     # Core logic (db, goal_parser, gap_analysis, path_generator, xai, feedback)
+│   │   ├── models/       # Pydantic data schemas and response models
+│   │   ├── data/         # Seed taxonomy datasets and local storage fallback
+│   │   └── main.py       # FastAPI application entry point and middleware
+│   ├── tests/            # Automated test suite (pytest)
+│   └── requirements.txt  # Python package specifications
 ├── frontend/
-│   ├── app/              # The main pages
-│   ├── components/       # Individual UI pieces (quiz, roadmap, skill picker, etc.)
-│   └── lib/              # Helpers for talking to the backend
-├── docs/                 # Additional documentation and diagrams
+│   ├── app/              # Next.js App Router (pages, layout, global styles)
+│   ├── components/       # React UI components (GoalInput, Dashboard, RoadmapTimeline, QuizModal, HistoryDrawer)
+│   ├── lib/              # API client and TypeScript interface definitions
+│   └── package.json      # Node.js dependencies and scripts
+├── docs/                 # System architecture diagrams and reference documentation
 ├── scripts/
-│   └── seed_db.py        # Script to pre-fill the database with skills and roles
-├── Dockerfile            # Instructions to package the app into a container
-└── README.md             # This file
+│   └── seed_db.py        # Database seeding utility
+├── Dockerfile            # Production container configuration
+└── README.md             # Project documentation
 ```
 
 ---
 
-## Current Limitations
+## Current Scope & Future Roadmap
 
-1. **Limited career paths for now** — The app currently covers 6 software-related careers. Adding a new career (like cybersecurity or data engineering) requires adding the relevant skills and their relationships to the database.
-2. **Simple quiz-based adaptation** — The plan adjusts based on fixed rules (fail → add refresher, ace → skip ahead). It doesn't yet learn from large amounts of learner data over time.
-3. **Best for individual use** — Works great for one person at a time. Multi-user team management is supported when connected to the cloud database.
+### Current Scope
+- **Curated Engineering Taxonomy**: Focused on 6 core software development and AI/DevOps disciplines.
+- **Rule-Based Adaptive Heuristics**: Dynamic remedial injection and skip-acceleration based on explicit quiz score thresholds.
+- **Dual Storage Support**: Seamless Firestore cloud integration with resilient local fallback.
 
-## What's Coming Next
-
-1. **GitHub & LinkedIn skill detection** — Automatically read your GitHub projects to figure out what skills you already have, without you having to select them manually.
-2. **Smarter adaptation over time** — Instead of fixed rules, the app would learn from what actually works for different types of learners.
-3. **Team dashboards** — Let engineering managers see skill gaps across their whole team and plan training for everyone at once.
+### Future Roadmap
+- **Automated Skill Verification**: Connect public GitHub repositories to automatically detect existing skills from code and commit histories.
+- **Cohort-Trained Adaptation**: Enhance heuristic quiz adjustments with statistical learner patterns across anonymized study groups.
+- **Enterprise Team Upskilling**: Aggregate dashboards for engineering leaders to identify team-wide skill gaps and orchestrate organization-level curricula.
