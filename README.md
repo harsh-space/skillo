@@ -238,6 +238,8 @@ The current deployed version establishes the full end-to-end product foundation:
 
 **Phase 1 Baseline Metrics** (v1.1 release gate, from `evaluation/results/v1.1_baseline_results.json`):
 
+<div align="center">
+
 | Metric | Result |
 | :--- | :--- |
 | Goal Classification Accuracy | 76.7% (23/30 test cases) |
@@ -245,6 +247,9 @@ The current deployed version establishes the full end-to-end product foundation:
 | Skill Gap Precision / Recall / F1 | 1.00 / 0.60 / 0.75 |
 | Roadmap DAG Invariant Violations | 0 (across all 6 roles) |
 | Roadmap Generation Latency (P50) | 7.0 ms |
+
+</div>
+
 
 ---
 
