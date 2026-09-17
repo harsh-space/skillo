@@ -120,16 +120,34 @@ export default function HistoryDrawer({
     }
   };
 
-  const handleDelete = async (e: React.MouseEvent, historyId: string) => {
+  const handleDelete = async (e: React.MouseEvent, historyId: string, isActive: boolean = false) => {
     e.stopPropagation();
     const targetId = getEffectiveLearnerId();
     try {
       await deleteHistoryItem(targetId, historyId);
-      setHistoryItems((prev) => prev.filter((h) => h.history_id !== historyId));
+      const remaining = historyItems.filter((h) => h.history_id !== historyId);
+      setHistoryItems(remaining);
+      if (isActive) {
+        if (remaining.length > 0) {
+          handleItemClick(remaining[0]);
+        } else {
+          onNewRoadmap();
+          onClose();
+        }
+      }
     } catch (err) {
       console.error('Failed to delete history item:', err);
       // Optimistic removal
-      setHistoryItems((prev) => prev.filter((h) => h.history_id !== historyId));
+      const remaining = historyItems.filter((h) => h.history_id !== historyId);
+      setHistoryItems(remaining);
+      if (isActive) {
+        if (remaining.length > 0) {
+          handleItemClick(remaining[0]);
+        } else {
+          onNewRoadmap();
+          onClose();
+        }
+      }
     }
   };
 
@@ -266,16 +284,14 @@ export default function HistoryDrawer({
 
                   {/* Actions on hover */}
                   <div className="flex items-center gap-1">
-                    {!item.is_active && (
-                      <button
-                        type="button"
-                        onClick={(e) => handleDelete(e, item.history_id)}
-                        title="Delete roadmap"
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition-all"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => handleDelete(e, item.history_id, !!item.is_active)}
+                      title="Delete roadmap"
+                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition-all cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                     <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 transition-colors" />
                   </div>
                 </div>
