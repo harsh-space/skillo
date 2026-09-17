@@ -46,10 +46,13 @@ _raw_origins = os.getenv(
 )
 ALLOWED_ORIGINS = [origin.strip() for origin in _raw_origins.split(",") if origin.strip()]
 
+# Scoped regex allowing local development, Skillo Vercel deployments/previews, and custom domains
+VERCEL_ORIGIN_REGEX = r"^https?://(localhost|127\.0\.0\.1|skillo[a-z0-9-]*(-contactharrsh-8109s-projects)?\.vercel\.app|skillo(-[a-z0-9-]+)?\.vercel\.app|skillo\.ai)(:\d+)?$"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|.*\.vercel\.app)(:\d+)?$",
+    allow_origin_regex=VERCEL_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
