@@ -71,29 +71,11 @@ Skillo AI comes pre-loaded with curated competencies across 6 primary engineerin
 
 ## How It Works Under the Hood
 
-```
-   Learner Input (Current Skills + Free-Text Goal)
-                         │
-                         ▼
-        [ Natural Language Goal Parser ]
-   (Character n-gram TF-IDF & Semantic Cosine Matching)
-                         │
-                         ▼
-           [ Skill Gap Analysis Engine ]
-    (Dense similarity comparison & level clamping)
-                         │
-                         ▼
-       [ Prerequisite Graph Path Generator ]
-     (NetworkX DAG closure & topological sorting)
-                         │
-                         ▼
-           [ Explainable AI (XAI) Engine ]
-   (Fact-grounded rationale synthesis from graph topology)
-                         │
-                         ▼
-      [ Interactive Dashboard & Adaptive Loop ]
-  (Real-time roadmap mutation on quiz assessment events)
-```
+<p align="center">
+  <img src="docs/career_ai_pipeline_flow.png" width="650" alt="Skillo AI Pipeline Flow"/>
+  <br/>
+  <em>Figure 1: Core AI pipeline and processing flow</em>
+</p>
 
 1. **Goal Parsing**: Converts free-text sentences into structured roles by calculating character-level n-gram term frequency and cosine similarity against role descriptions and aliases.
 2. **Gap Analysis**: Compares the learner's existing skills against the role's required skills using sublinear TF-IDF vectors, ensuring basic and advanced skills are distinguished accurately.
@@ -119,38 +101,11 @@ The application is structured into two decoupled tiers:
 
 ### Architecture & Telemetry Flow
 
-```mermaid
-flowchart TD
-    subgraph UI ["1. Presentation Layer (Next.js & Tailwind CSS)"]
-        A["Learner Input\n(Goal Text + Current Skills)"]
-        B["Interactive Dashboard\n(Roadmap Timeline & Progress)"]
-        C["Quiz Assessment\n(Pass / Fail / High Mastery)"]
-        H["History Drawer\n(Switch & Manage Paths)"]
-    end
-
-    subgraph API ["2. API & Security Layer (FastAPI)"]
-        Auth["Auth & Ownership Validation\n(Bcrypt Hashing + Bearer Token)"]
-        Endpoints["REST API Endpoints\n(/goal, /recommend, /feedback, /history)"]
-    end
-
-    subgraph Core ["3. Core Analytics & Graph Engine"]
-        NLP["Goal Parsing Engine\n(Character n-gram TF-IDF + Cosine Similarity)"]
-        Gap["Skill Gap Analyzer\n(Cosine Similarity, tau = 0.60)"]
-        DAG["DAG Path Generator\n(Prerequisite Closure & Topological Sort)"]
-        XAI["Explainable AI (XAI)\n(Fact-Grounded Graph Rationale)"]
-        Adapt["Adaptive Mutation Engine\n(Remedial Refresher / Skip Acceleration)"]
-    end
-
-    subgraph Storage ["4. Persistence & Storage Layer"]
-        DB[("Database Engine\n(Google Firestore / Local JSON Fallback)")]
-    end
-
-    A --> Auth --> Endpoints
-    Endpoints --> NLP --> Gap --> DAG --> XAI --> DB
-    DB --> B
-    C --> Endpoints --> Adapt --> DB
-    H --> Endpoints --> DB
-```
+<p align="center">
+  <img src="docs/career_ai_full_detail_flow.png" width="700" alt="Skillo AI Detailed System Flow"/>
+  <br/>
+  <em>Figure 2: End-to-end multi-layer telemetry and system architecture</em>
+</p>
 
 ---
 
