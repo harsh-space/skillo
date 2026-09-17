@@ -222,14 +222,51 @@ To experience the core features and adaptive feedback loop:
 
 ---
 
-## Current Scope & Future Roadmap
+## Current Scope & Phase 2 Roadmap
 
-### Current Scope
-- **Curated Engineering Taxonomy**: Focused on 6 core software development and AI/DevOps disciplines.
-- **Rule-Based Adaptive Heuristics**: Dynamic remedial injection and skip-acceleration based on explicit quiz score thresholds.
-- **Dual Storage Support**: Seamless Firestore cloud integration with resilient local fallback.
+### Phase 1 — What Is Live (Completed)
 
-### Future Roadmap
-- **Automated Skill Verification**: Connect public GitHub repositories to automatically detect existing skills from code and commit histories.
-- **Cohort-Trained Adaptation**: Enhance heuristic quiz adjustments with statistical learner patterns across anonymized study groups.
-- **Enterprise Team Upskilling**: Aggregate dashboards for engineering leaders to identify team-wide skill gaps and orchestrate organization-level curricula.
+The current deployed version establishes the full end-to-end product foundation:
+
+- **Curated Engineering Taxonomy**: 6 core tracks (Frontend, Backend, Full Stack, ML, AI, DevOps) with 36 skills, 29 prerequisite edges, and 49 curated learning resources.
+- **Semantic Goal Classification**: Character n-gram TF-IDF vectorization with alias boosts maps natural-language goals to target roles with sub-5ms latency. Gemini Flash / OpenAI are available as fallback classifiers for edge cases.
+- **Skill Gap Detection**: Cosine similarity against skill embeddings distinguishes mastered, partial, and missing competencies including depth differentiation (e.g. basic vs advanced Python).
+- **Graph-Based Prerequisite Ordering**: NetworkX Directed Acyclic Graph topological sort guarantees zero cyclic dependencies across all 6 role roadmaps.
+- **Fact-Grounded Explainable AI**: Every roadmap step includes a dependency-grounded rationale synthesized from graph relationships.
+- **Real-Time Adaptive Feedback Loop**: Quiz scores dynamically inject remedial refreshers (score < 50%) or fast-track downstream steps (score ≥ 90%).
+- **Multi-Roadmap History with Deletion**: Learners can manage multiple roadmap histories with persistent storage.
+
+**Phase 1 Baseline Metrics** (v1.1 release gate, from `evaluation/results/v1.1_baseline_results.json`):
+
+| Metric | Result |
+| :--- | :--- |
+| Goal Classification Accuracy | 76.7% (23/30 test cases) |
+| Goal Classification Latency (P50) | 4.6 ms |
+| Skill Gap Precision / Recall / F1 | 1.00 / 0.60 / 0.75 |
+| Roadmap DAG Invariant Violations | 0 (across all 6 roles) |
+| Roadmap Generation Latency (P50) | 7.0 ms |
+
+---
+
+### Phase 2 — Planned Improvements
+
+Phase 2 upgrades the algorithmic intelligence of the system while maintaining zero-hallucination guarantees and strict roadmap safety. Full technical specifications are in [`docs/v2-planning/`](docs/v2-planning/).
+
+#### 1. Dense Semantic Goal Classifier
+Replace TF-IDF n-gram matching with a lightweight **Sentence Transformer model** (`all-MiniLM-L6-v2`) for intent classification. Precomputed role embedding vectors deliver deep contextual understanding of synonym-heavy and multi-clause goals.
+- **Target**: Goal classification accuracy ≥ 90% (up from 76.7%).
+- **Constraint**: Latency budget remains < 25ms on CPU.
+
+#### 2. Hybrid Skill Gap Matching
+Introduce a **3-tier matching pipeline** (Exact Token → Dense Cosine Similarity → Calibrated Partial Match) to accurately resolve skill synonyms and adjacent competencies that exact string matching misses.
+- **Target**: Skill Gap F1 ≥ 0.90, Recall ≥ 0.90 (up from F1: 0.75, Recall: 0.60).
+
+#### 3. Constrained Multi-Factor Resource Ranker
+Replace static skill-to-resource dictionary lookup with a **scored ranking algorithm** that weights semantic relevance, difficulty alignment to the learner's level, and resource quality — while strictly drawing only from the verified seed catalog.
+- **Target**: Zero hallucinated or invalid resource URLs (maintained at 100%).
+
+#### 4. Grounded AI Narrative Synthesis
+Define a **strict LLM boundary**: the prerequisite graph, skill node ordering, and resource assignments are computed deterministically. The LLM is only invoked to synthesize motivational coaching descriptions and practical project suggestions on top of the fixed structure.
+- **Target**: 0% ungrounded skills or hallucinated nodes in any generated roadmap.
+
+See [`docs/v2-planning/success-criteria.md`](docs/v2-planning/success-criteria.md) for the full quantitative gate checklist required before Phase 2 ships.
