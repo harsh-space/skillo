@@ -1,4 +1,4 @@
-import hashlib
+import bcrypt
 import os
 import secrets
 from datetime import datetime, timezone
@@ -11,17 +11,36 @@ from app.services.db import db
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-def _hash_password(password: str, salt: Optional[str] = None) -> tuple[str, str]:
-    if not salt:
-        salt = secrets.token_hex(16)
-    salted = f"{password}:{salt}".encode("utf-8")
-    pwd_hash = hashlib.sha256(salted).hexdigest()
-    return pwd_hash, salt
+def _hash_password(password: str) -> str:
+    """Hashes a plaintext password using bcrypt with automatic salt generation."""
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
-def _verify_password(password: str, stored_hash: str, salt: str) -> bool:
-    pwd_hash, _ = _hash_password(password, salt)
-    return pwd_hash == stored_hash
+def _verify_password(password: str, stored_hash: str) -> bool:
+    """Verifies a plaintext password against a stored bcrypt hash."""
+    try:
+        return bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8"))
+    except Exception:
+        return False
+
+
+def verify_learner_ownership(learner_id: str, authorization: Optional[str] = Header(None)) -> None:
+    """
+    Validates that if an Authorization Bearer header is provided, the token belongs
+    to the owner of the requested learner_id.
+    """
+    if not authorization or not isinstance(authorization, str):
+        return
+    token = authorization.replace("Bearer ", "").strip()
+    if not token:
+        return
+    users = db.list_documents("users")
+    user = next((u for u in users if u.get("token") == token), None)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid or expired session token.")
+    user_learner_id = user.get("learner_id", f"learner_{user['user_id']}")
+    if user_learner_id != learner_id:
+        raise HTTPException(status_code=403, detail="Forbidden: You do not have permission to access this learner profile.")
 
 
 @router.post("/signup", response_model=UserResponse)
@@ -41,8 +60,7 @@ def signup(req: UserSignupRequest):
     if existing_users:
         target_user = existing_users[0]
         stored_hash = target_user.get("password_hash", "")
-        salt = target_user.get("salt", "")
-        if _verify_password(req.password, stored_hash, salt):
+        if _verify_password(req.password, stored_hash):
             # Password matches: auto-login existing user seamlessly
             token = target_user.get("token") or secrets.token_hex(24)
             target_user["token"] = token
@@ -62,7 +80,7 @@ def signup(req: UserSignupRequest):
     clean_name = "".join(c for c in clean_name if c.isalnum() or c == "_")
     learner_id = f"learner_{clean_name}_{secrets.token_hex(4)}"
 
-    pwd_hash, salt = _hash_password(req.password)
+    pwd_hash = _hash_password(req.password)
     token = secrets.token_hex(24)
     now = datetime.now(timezone.utc).isoformat()
 
@@ -71,7 +89,6 @@ def signup(req: UserSignupRequest):
         "name": name,
         "email": email,
         "password_hash": pwd_hash,
-        "salt": salt,
         "learner_id": learner_id,
         "token": token,
         "created_at": now,
@@ -119,9 +136,8 @@ def login(req: UserLoginRequest):
 
     target_user = existing_users[0]
     stored_hash = target_user.get("password_hash", "")
-    salt = target_user.get("salt", "")
 
-    if not _verify_password(req.password, stored_hash, salt):
+    if not _verify_password(req.password, stored_hash):
         raise HTTPException(status_code=401, detail="Incorrect password. Please try again.")
 
     # Generate or reuse token

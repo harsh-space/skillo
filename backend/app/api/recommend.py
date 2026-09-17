@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Optional
 from app.models.schemas import (
     RecommendRequest,
     RoadmapResponse,
@@ -13,24 +13,22 @@ from app.services.db import db
 from app.services.gap_analysis import run_gap_analysis
 from app.services.path_generator import generate_learning_path
 from app.services.xai import _template_grounded_explanation
+from app.api.auth import verify_learner_ownership
 
 router = APIRouter(tags=["Recommendation"])
 
 
 @router.post("/recommend", response_model=RoadmapResponse)
-def generate_recommendation(req: RecommendRequest):
+def generate_recommendation(req: RecommendRequest, authorization: Optional[str] = Header(None)):
+    verify_learner_ownership(req.learner_id, authorization)
+
     # 1. Load learner profile
     learner_doc = db.get_document("learners", req.learner_id)
     if not learner_doc:
-        learner_doc = {
-            "learner_id": req.learner_id,
-            "name": "Learner",
-            "current_skills": [],
-            "target_role_id": "role_backend_developer",
-            "created_at": datetime.now(timezone.utc).isoformat(),
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        }
-        db.set_document("learners", req.learner_id, learner_doc)
+        raise HTTPException(
+            status_code=404,
+            detail=f"Learner profile '{req.learner_id}' not found. Please create profile first."
+        )
 
     target_role_id = learner_doc.get("target_role_id") or "role_backend_developer"
     current_skills = learner_doc.get("current_skills", [])
@@ -131,21 +129,36 @@ def generate_recommendation(req: RecommendRequest):
 
 
 @router.get("/roadmap/{learner_id}", response_model=RoadmapResponse)
-def get_learner_roadmap(learner_id: str, regenerate: bool = False):
+def get_learner_roadmap(learner_id: str, regenerate: bool = False, authorization: Optional[str] = Header(None)):
+    verify_learner_ownership(learner_id, authorization)
+
+    learner_doc = db.get_document("learners", learner_id)
+    if not learner_doc:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Learner profile '{learner_id}' not found."
+        )
+
     if regenerate:
-        return generate_recommendation(RecommendRequest(learner_id=learner_id))
+        return generate_recommendation(RecommendRequest(learner_id=learner_id), authorization=authorization)
 
     doc = db.get_document("roadmaps", learner_id)
     if not doc:
-        # Generate automatically if not exists
-        return generate_recommendation(RecommendRequest(learner_id=learner_id))
+        # Generate automatically if profile exists but roadmap not yet generated
+        return generate_recommendation(RecommendRequest(learner_id=learner_id), authorization=authorization)
 
     return RoadmapResponse(**doc)
 
 
 @router.get("/history/{learner_id}", response_model=List[RoadmapHistoryItem])
-def get_learner_history(learner_id: str):
+def get_learner_history(learner_id: str, authorization: Optional[str] = Header(None)):
     """Retrieves all past and active roadmap sessions for this learner."""
+    verify_learner_ownership(learner_id, authorization)
+
+    learner_doc = db.get_document("learners", learner_id)
+    if not learner_doc:
+        raise HTTPException(status_code=404, detail=f"Learner profile '{learner_id}' not found.")
+
     all_hist = db.query_documents("roadmap_history", "learner_id", learner_id)
     
     active_rm = db.get_document("roadmaps", learner_id)
@@ -207,8 +220,10 @@ def get_learner_history(learner_id: str):
 
 
 @router.post("/history/activate", response_model=RoadmapResponse)
-def activate_history_roadmap(req: ActivateHistoryRequest):
+def activate_history_roadmap(req: ActivateHistoryRequest, authorization: Optional[str] = Header(None)):
     """Switches the learner's active roadmap to a selected historical roadmap."""
+    verify_learner_ownership(req.learner_id, authorization)
+
     hist_doc = db.get_document("roadmap_history", req.history_id)
     if not hist_doc or hist_doc.get("learner_id") != req.learner_id:
         raise HTTPException(status_code=404, detail="Roadmap history record not found.")
@@ -249,8 +264,10 @@ def activate_history_roadmap(req: ActivateHistoryRequest):
 
 
 @router.delete("/history/{learner_id}/{history_id}")
-def delete_history_item(learner_id: str, history_id: str):
+def delete_history_item(learner_id: str, history_id: str, authorization: Optional[str] = Header(None)):
     """Deletes an archived roadmap from history."""
+    verify_learner_ownership(learner_id, authorization)
+
     hist_doc = db.get_document("roadmap_history", history_id)
     if hist_doc and hist_doc.get("learner_id") == learner_id:
         db.delete_document("roadmap_history", history_id)

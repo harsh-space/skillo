@@ -1,7 +1,10 @@
 import json
+import logging
 import os
 from typing import Dict, Any, List, Optional
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 # Prevent gRPC segmentation faults in containerized async environments
 os.environ["GRPC_ENABLE_FORK_SUPPORT"] = "0"
@@ -83,7 +86,7 @@ class DatabaseClient:
 
             if resolved_path:
                 cred = credentials.Certificate(resolved_path)
-                print(f"[DB] Initializing Firebase with key from: {resolved_path}")
+                logger.debug("[DB] Initializing Firebase with key from resolved path.")
             elif cred_json_str:
                 cred_dict = json.loads(cred_json_str) if isinstance(cred_json_str, str) else cred_json_str
                 # Normalize escaped newlines in private_key if passed via env var
@@ -96,12 +99,12 @@ class DatabaseClient:
                 if not firebase_admin._apps:
                     firebase_admin.initialize_app(cred)
                 self.firestore_db = firestore.client()
-                print("[DB] SUCCESS: Connected to live Firebase Firestore database!")
+                logger.info("[DB] SUCCESS: Connected to live Firebase Firestore database.")
             else:
                 self.firestore_db = None
-                print("[DB] No valid Firebase credentials found. Running in local fallback mode.")
+                logger.info("[DB] Running in local fallback mode (no valid Firebase credentials).")
         except Exception as e:
-            print(f"[DB Warning] Could not initialize Firestore: {e}. Using local JSON storage.")
+            logger.warning("[DB] Could not initialize Firestore: %s. Using local JSON storage.", e)
             self.firestore_db = None
 
     def _load_local_db(self):
@@ -133,7 +136,7 @@ class DatabaseClient:
                     resources = json.load(f)
                     self.local_data["resources"] = {r["resource_id"]: r for r in resources}
         except Exception as e:
-            print(f"[DB Warning] Could not load seed files: {e}")
+            logger.warning("[DB] Could not load seed files: %s", e)
 
         # 2. Load dynamic learner/roadmap records from db_storage.json if exists
         if os.path.exists(LOCAL_DB_FILE):
@@ -152,7 +155,7 @@ class DatabaseClient:
             with open(LOCAL_DB_FILE, "w", encoding="utf-8") as f:
                 json.dump(self.local_data, f, indent=2)
         except Exception as e:
-            print(f"[DB Warning] Could not write local db file: {e}")
+            logger.warning("[DB] Could not write local db file: %s", e)
 
     def set_document(self, collection: str, doc_id: str, data: Dict[str, Any]):
         if collection not in self.local_data:
@@ -164,7 +167,7 @@ class DatabaseClient:
             try:
                 self.firestore_db.collection(collection).document(doc_id).set(data, timeout=3.0)
             except Exception as e:
-                print(f"[DB Error] Firestore set failed for {collection}/{doc_id}: {e}")
+                logger.error("[DB] Firestore set failed for %s/%s: %s", collection, doc_id, e)
 
     def get_document(self, collection: str, doc_id: str) -> Optional[Dict[str, Any]]:
         # Fast memory check first
