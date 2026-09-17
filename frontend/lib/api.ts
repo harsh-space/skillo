@@ -1,10 +1,16 @@
 const getApiBase = (): string => {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL;
+  if (envUrl) {
+    const raw = envUrl.trim().replace(/\/+$/, "");
+    return raw.endsWith("/api/v1") ? raw : `${raw}/api/v1`;
+  }
   if (typeof window !== "undefined") {
     // In browser: use relative path to route through Next.js proxy (100% same-origin, 0 CORS)
     return "/api/v1";
   }
-  const raw = (process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || "http://127.0.0.1:8000/api/v1").trim().replace(/\/+$/, "");
-  return raw.endsWith("/api/v1") ? raw : `${raw}/api/v1`;
+  return process.env.NODE_ENV === "production"
+    ? "https://skillo-zawx.vercel.app/api/v1"
+    : "http://127.0.0.1:8000/api/v1";
 };
 
 const API_BASE = getApiBase();
