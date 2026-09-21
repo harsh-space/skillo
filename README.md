@@ -1,4 +1,4 @@
-# Skillo AI
+# Skillo AI  ![Hackathon Project](https://img.shields.io/badge/type-Hackathon%20Project-orange) 
 
 ## An intelligent career learning assistant that maps your current skills, generates ordered prerequisite roadmaps, and adapts in real time based on your progress
 
