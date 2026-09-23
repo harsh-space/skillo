@@ -1,19 +1,19 @@
-# Skillo AI  ![Hackathon Project](https://img.shields.io/badge/type-Hackathon%20Project-orange) 
+# Skillo  ![Hackathon Project](https://img.shields.io/badge/type-Hackathon%20Project-orange) 
 
 ## An intelligent career learning assistant that maps your current skills, generates ordered prerequisite roadmaps, and adapts in real time based on your progress
 
-> Static learning roadmaps only show you a fixed list of topics. Skillo AI identifies what you already know, pinpoints what you are missing, arranges your learning path in strict prerequisite order, and dynamically updates your roadmap when you take quizzes.
+> Static learning roadmaps only show you a fixed list of topics. Skillo identifies what you already know, pinpoints what you are missing, arranges your learning path in strict prerequisite order, and dynamically updates your roadmap when you take quizzes.
 
 > [!IMPORTANT]
 > **Live Web App & Interactive Demo**: [skillo-frontend-amber.vercel.app](https://skillo-frontend-amber.vercel.app/)
 
 ---
 
-## What Is Skillo AI?
+## What Is Skillo?
 
 When learning to become a software engineer or switching careers, it is easy to get overwhelmed by thousands of courses and tutorials without knowing where to begin or what to study first. Generic roadmaps assume everyone starts from scratch, forcing experienced learners to repeat familiar concepts while leaving beginners stuck on advanced topics without foundational prerequisites.
 
-**Skillo AI** solves this by acting as a smart, personalized career learning guide. You tell it your current skills and type your career goal in natural language (for example: *"I know HTML, CSS, and basic Python and want to become a backend developer with databases and APIs"*), and the system:
+**Skillo** solves this by acting as a smart, personalized career learning guide. You tell it your current skills and type your career goal in natural language (for example: *"I know HTML, CSS, and basic Python and want to become a backend developer with databases and APIs"*), and the system:
 
 1. **Understands Your Goal** — Reads your unformatted sentence and identifies your target career role using semantic similarity and keyword analysis.
 2. **Finds Your Exact Skill Gaps** — Compares what you already know against the target role's requirements, distinguishing skill depth (such as basic vs advanced levels) so mastered skills are acknowledged and missing ones are highlighted.
@@ -29,7 +29,7 @@ When learning to become a software engineer or switching careers, it is easy to 
 
 ## Why It Matters: The Problem vs The Solution
 
-| The Traditional Problem | How Skillo AI Solves It |
+| The Traditional Problem | How Skillo Solves It |
 |---|---|
 | **Keyword search overload**: Searching online returns isolated tools without explaining what prerequisites you need first. | **Prerequisite Graph Engine**: Automatically discovers unstated foundational requirements (e.g. Linux CLI before Docker) and places them in logical order. |
 | **One-size-fits-all roadmaps**: Generic roadmaps ignore what you already know, wasting your time on mastered topics. | **Skill Gap Analysis**: Compares your stated background against target requirements and creates a custom curriculum containing only your actual gaps. |
@@ -54,7 +54,7 @@ When learning to become a software engineer or switching careers, it is easy to 
 
 ## Supported Career Roles
 
-Skillo AI comes pre-loaded with curated competencies across 6 primary engineering tracks:
+Skillo comes pre-loaded with curated competencies across 6 primary engineering tracks:
 
 | Career Track | Core Focus & Covered Competencies |
 |---|---|
@@ -72,7 +72,7 @@ Skillo AI comes pre-loaded with curated competencies across 6 primary engineerin
 ## How It Works Under the Hood
 
 <p align="center">
-  <img src="docs/career_ai_pipeline_flow.png" width="650" alt="Skillo AI Pipeline Flow"/>
+  <img src="docs/career_ai_pipeline_flow.png" width="650" alt="Skillo Pipeline Flow"/>
   <br/>
   <em>Figure 1: Core AI pipeline and processing flow</em>
 </p>
@@ -102,7 +102,7 @@ The application is structured into two decoupled tiers:
 ### Architecture & Telemetry Flow
 
 <p align="center">
-  <img src="docs/career_ai_full_detail_flow.png" width="700" alt="Skillo AI Detailed System Flow"/>
+  <img src="docs/career_ai_full_detail_flow.png" width="700" alt="Skillo Detailed System Flow"/>
   <br/>
   <em>Figure 2: End-to-end multi-layer telemetry and system architecture</em>
 </p>
@@ -181,7 +181,7 @@ To experience the core features and adaptive feedback loop:
 1. **Sign Up / Log In**: Create an account or log in on the start screen.
 2. **Select Initial Skills**: Choose `HTML`, `CSS`, and `Python (basic)` in the onboarding skill picker.
 3. **Enter Career Goal**: Type *"I want to become a backend developer"* and submit.
-4. **Inspect Generated Roadmap**: Skillo AI extracts the `Backend Developer` role and orders your missing competencies in prerequisite order:
+4. **Inspect Generated Roadmap**: Skillo extracts the `Backend Developer` role and orders your missing competencies in prerequisite order:
    `Python (advanced) → SQL & Relational Databases → REST APIs → Git & GitHub → Authentication & JWT → Docker & Containers`
 5. **View Step Explanation**: Click **"Why this recommendation?"** on the `REST APIs` step:
    > *"Building on your Python (advanced) and SQL foundations, mastering REST APIs enables you to expose backend data services required for your Backend Developer goal. This unlocks subsequent modules in Authentication & JWT and containerized deployment with Docker."*
